@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>MedTech Quiz • Teaching & Learning Strategies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Security Warning Overlay -->
+  <div class="security-overlay hidden" id="security-overlay">
+    <div class="security-modal">
+      <div class="security-icon">🔒</div>
+      <h2 class="security-title">401 Unauthorized Access</h2>
+      <p class="security-message">
+        Developer tools or inspection mode has been detected.
+      </p>
+      <div class="security-details">
+        <p>To protect the integrity of the quiz system, access has been temporarily restricted.</p>
+        <ul>
+          <li>Close all developer tools and inspection windows</li>
+          <li>Refresh the page to restore access</li>
+          <li>All quiz data and scores remain secure</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" onclick="restoreAccess()">
+        🔄 I Understand - Restore Access
+      </button>
+      <p class="security-footer">
+        This is an automated security measure. Your progress has been saved.
+      </p>
+    </div>
+  </div>
+
+  <!-- Session Timeout Warning -->
+  <div class="session-warning hidden" id="session-warning">
+    <div class="session-warning-content">
+      <span class="session-warning-icon">⏰</span>
+      <div>
+        <strong>Session Expiring Soon</strong>
+        <p>Your session will expire in <span id="session-countdown">60</span> seconds. Save your progress.</p>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="extendSession()">Extend Session</button>
+    </div>
+  </div>
+
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="confetti-wrap" id="confetti-wrap" aria-hidden="true"></div>
+
+  <!-- ==================== SCREEN: LANDING ==================== -->
+  <div class="screen active" id="screen-landing">
+    <div class="landing-hero">
+      <span class="landing-emoji" aria-hidden="true">🔬</span>
+      <h1 class="landing-title">
+        <span>PSTMLS </span><span>Interactive Challenge</span>
+      </h1>
+      <p class="landing-sub">Created by Shaine, Danielle, Krisela, and Julliene – BSMT-O2A | Group 7</p>
+      <div class="landing-btns">
+        <button class="btn btn-play" onclick="goToRegister()">▶&nbsp;Start Quiz</button>
+        <button class="btn btn-admin" onclick="goToAdminLogin()">🔐&nbsp;Admin Access</button>
+      </div>
+    </div>
+    <div class="features">
+      <div class="feature-badge"><span>📋</span> 10 Questions</div>
+      <div class="feature-badge"><span>⏱️</span> Timed Rounds</div>
+      <div class="feature-badge"><span>📊</span> Instant Results</div>
+      <div class="feature-badge"><span>🔒</span> Secure Platform</div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: REGISTRATION ==================== -->
+  <div class="screen" id="screen-registration">
+    <div class="card registration-card">
+      <div class="logo">Unit 4 Quiz</div>
+      <p class="logo-tagline">Complete Your Profile</p>
+      
+      <div class="registration-form">
+        <div class="form-row">
+          <div class="input-group">
+            <label for="first-name">First Name <span class="required">*</span></label>
+            <input type="text" id="first-name" placeholder="Enter your first name" maxlength="30" autocomplete="off">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="input-group">
+            <label for="middle-name">Middle Name</label>
+            <input type="text" id="middle-name" placeholder="Enter your middle name" maxlength="30" autocomplete="off">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="input-group">
+            <label for="last-name">Last Name <span class="required">*</span></label>
+            <input type="text" id="last-name" placeholder="Enter your last name" maxlength="30" autocomplete="off">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="input-group">
+            <label for="section">Section <span class="required">*</span></label>
+            <input type="text" id="section" placeholder="Enter your section (e.g., A, B, C)" maxlength="10" autocomplete="off">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="input-group">
+            <label>Group Selection <span class="required">*</span></label>
+            <div class="group-select-container" id="group-container">
+              <div class="group-select-trigger" id="group-select-trigger" onclick="toggleGroupDropdown()" tabindex="0">
+                <span id="group-select-text">Select your group</span>
+                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="group-dropdown hidden" id="group-dropdown">
+                <div class="group-option" onclick="selectGroup('Group 1')">Group 1</div>
+                <div class="group-option" onclick="selectGroup('Group 2')">Group 2</div>
+                <div class="group-option" onclick="selectGroup('Group 3')">Group 3</div>
+                <div class="group-option" onclick="selectGroup('Group 4')">Group 4</div>
+                <div class="group-option" onclick="selectGroup('Group 5')">Group 5</div>
+                <div class="group-option" onclick="selectGroup('Group 6')">Group 6</div>
+                <div class="group-option" onclick="selectGroup('Group 7')">Group 7</div>
+                <div class="group-option" onclick="selectGroup('Group 8')">Group 8</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-error" id="form-error">
+          <span class="error-icon" aria-hidden="true">⚠️</span>
+          <span id="form-error-text"></span>
+        </div>
+        
+        <button class="btn btn-primary" onclick="startGame()">🎮 &nbsp;Start Quiz</button>
+        <div class="divider"><span>or</span></div>
+        <button class="btn btn-secondary" onclick="navigateBack('screen-landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: QUIZ SELECT ==================== -->
+  <div class="screen" id="screen-select">
+    <div class="page-header">
+      <p class="user-greeting" id="greeting-name"></p>
+      <h2>Choose Your Quiz</h2>
+      <p>Select a category and test your knowledge!</p>
+    </div>
+    <div class="quiz-grid" id="quiz-grid"></div>
+  </div>
+
+  <!-- ==================== SCREEN: QUIZ ==================== -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-header">
+      <div class="quiz-info">
+        <div class="quiz-title-bar" id="quiz-title-bar">Teaching & Learning Strategies</div>
+        <div class="question-count" id="question-count">Question 1 of 10</div>
+      </div>
+      <div class="timer-wrapper">
+        <svg class="timer-svg" viewBox="0 0 100 100">
+          <circle class="timer-bg" cx="50" cy="50" r="45"/>
+          <circle class="timer-ring" id="timer-ring" cx="50" cy="50" r="45"/>
+        </svg>
+        <div class="timer-text" id="timer-text">30</div>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="question-card">
+      <p class="question-text" id="question-text"></p>
+      <div class="options-grid" id="options-grid"></div>
+      <div class="feedback-banner" id="feedback-banner">
+        <span class="feedback-icon" id="feedback-icon"></span>
+        <span id="feedback-text"></span>
+      </div>
+      <div class="auto-advance-indicator" id="auto-advance-indicator">
+        <div class="auto-advance-dot"></div>
+        <span>Advancing to next question...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: RESULTS ==================== -->
+  <div class="screen" id="screen-results">
+    <div class="results-hero">
+      <span class="results-emoji" id="results-emoji">🎉</span>
+      <h2 class="results-title" id="results-title">Amazing Work!</h2>
+      <p class="results-subtitle" id="results-subtitle">Here's how you performed</p>
+    </div>
+    <div class="score-circle-wrap">
+      <div class="score-circle" id="score-circle">
+        <div class="score-circle-inner">
+          <span class="score-num" id="score-num">0/10</span>
+          <span class="score-label">Score</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill stat-correct"><span class="stat-pill-num" id="stat-correct">0</span><span class="stat-pill-lbl">✅ Correct</span></div>
+      <div class="stat-pill stat-incorrect"><span class="stat-pill-num" id="stat-incorrect">0</span><span class="stat-pill-lbl">❌ Incorrect</span></div>
+      <div class="stat-pill stat-skipped"><span class="stat-pill-num" id="stat-skipped">0</span><span class="stat-pill-lbl">⏭️ Skipped</span></div>
+    </div>
+    
+    <div class="motivation-banner" id="motivation-banner">
+      <div class="motivation-content">
+        <span class="motivation-emoji">💜</span>
+        <div class="motivation-text">
+          <p class="motivation-title">A Reminder from Your MedTech Family</p>
+          <p class="motivation-quote">"This score does not define you as a future MedTech professional. Every great healthcare worker started as a student who didn't give up. Keep learning, keep growing — you've got this!"</p>
+          <p class="motivation-signature">— Shaine, Danielle, Krisela, and Julliene 🌟</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="review-section">
+      <h3>📝 Review Answers</h3>
+      <div id="review-list"></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn btn-primary" onclick="navigateBack('screen-landing')">🏠 Home</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: ADMIN LOGIN ==================== -->
+  <div class="screen" id="screen-admin-login">
+    <div class="card admin-login-card">
+      <div class="admin-login-header">
+        <div class="admin-login-icon" aria-hidden="true">🔐</div>
+        <h2>Admin Portal</h2>
+        <p>Enter your credentials to access the dashboard</p>
+      </div>
+      <div class="admin-login-form">
+        <div class="input-group">
+          <label for="admin-username">Username</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon" aria-hidden="true">👤</span>
+            <input type="text" id="admin-username" class="input-with-icon" placeholder="Enter admin username" autocomplete="off">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="admin-password">Password</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon" aria-hidden="true">🔒</span>
+            <input type="password" id="admin-password" class="input-with-icon" placeholder="Enter admin password" autocomplete="off" onkeydown="if(event.key==='Enter') adminLogin()">
+          </div>
+        </div>
+        <div class="login-error" id="admin-login-error">
+          <span class="error-icon" aria-hidden="true">⚠️</span>
+          <span id="admin-login-error-text">Invalid credentials.</span>
+        </div>
+        <button class="btn btn-primary login-btn" onclick="adminLogin()"><span class="login-btn-icon">🔓</span> Sign In</button>
+        <div class="divider"><span>or</span></div>
+        <button class="btn btn-secondary" onclick="navigateBack('screen-landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: ADMIN DASHBOARD ==================== -->
+  <div class="screen" id="screen-admin">
+  <div class="admin-dashboard">
+    <div class="dashboard-header">
+      <div class="dashboard-header-content">
+        <div class="dashboard-header-left">
+          <div class="dashboard-badge">🔐 Admin Panel</div>
+          <h1>Quiz Dashboard</h1>
+          <p>Monitor all student results & performance analytics</p>
+        </div>
+        <div class="dashboard-header-right">
+          <button class="btn btn-refresh btn-sm" onclick="refreshDashboard()" id="refresh-btn">
+            <span>🔄</span> Refresh
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">
+            <span>🗑️</span> Clear All Data
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="adminLogout()">
+            <span>←</span> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+      <div class="dashboard-stats" id="admin-stats">
+        <div class="stat-card stat-card-purple"><div class="stat-card-icon">👥</div><div class="stat-card-content"><div class="stat-card-value" id="stat-users">0</div><div class="stat-card-label">Total Students</div></div></div>
+        <div class="stat-card stat-card-purple"><div class="stat-card-icon">🎮</div><div class="stat-card-content"><div class="stat-card-value" id="stat-attempts">0</div><div class="stat-card-label">Quiz Attempts</div></div></div>
+        <div class="stat-card stat-card-purple"><div class="stat-card-icon">📊</div><div class="stat-card-content"><div class="stat-card-value" id="stat-avg">0%</div><div class="stat-card-label">Average Score</div></div></div>
+        <div class="stat-card stat-card-purple"><div class="stat-card-icon">🏆</div><div class="stat-card-content"><div class="stat-card-value" id="stat-top">0%</div><div class="stat-card-label">Highest Score</div></div></div>
+      </div>
+      <div class="table-container">
+        <div class="table-header"><h3>👥 Quiz Results</h3><span class="result-badge" id="result-count">0 Records</span></div>
+        <div class="table-scroll">
+          <table id="admin-table">
+            <thead><tr><th>#</th><th>Full Name</th><th>Section</th><th>Group</th><th>Quiz</th><th>Score</th><th>Details</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODALS ========== -->
+  <div class="modal-overlay hidden" id="detail-modal">
+    <div class="modal">
+      <div class="modal-header"><button class="modal-close" onclick="closeModal()">×</button><h3 id="modal-title">Quiz Details</h3><p class="modal-sub" id="modal-sub"></p></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+  <div class="modal-overlay hidden" id="delete-modal">
+    <div class="modal delete-modal">
+      <div class="modal-header"><h3>⚠️ Delete Confirmation</h3></div>
+      <div class="modal-body"><p class="delete-message" id="delete-message"></p><div class="delete-actions"><button class="btn btn-secondary btn-sm" onclick="closeDeleteModal()">Cancel</button><button class="btn btn-danger btn-sm" id="delete-confirm-btn">Delete</button></div></div>
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
