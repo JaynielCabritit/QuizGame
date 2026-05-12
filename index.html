@@ -10,43 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Security Warning Overlay -->
-  <div class="security-overlay hidden" id="security-overlay">
-    <div class="security-modal">
-      <div class="security-icon">🔒</div>
-      <h2 class="security-title">401 Unauthorized Access</h2>
-      <p class="security-message">
-        Developer tools or inspection mode has been detected.
-      </p>
-      <div class="security-details">
-        <p>To protect the integrity of the quiz system, access has been temporarily restricted.</p>
-        <ul>
-          <li>Close all developer tools and inspection windows</li>
-          <li>Refresh the page to restore access</li>
-          <li>All quiz data and scores remain secure</li>
-        </ul>
-      </div>
-      <button class="btn btn-primary" onclick="restoreAccess()">
-        🔄 I Understand - Restore Access
-      </button>
-      <p class="security-footer">
-        This is an automated security measure. Your progress has been saved.
-      </p>
-    </div>
-  </div>
-
-  <!-- Session Timeout Warning -->
-  <div class="session-warning hidden" id="session-warning">
-    <div class="session-warning-content">
-      <span class="session-warning-icon">⏰</span>
-      <div>
-        <strong>Session Expiring Soon</strong>
-        <p>Your session will expire in <span id="session-countdown">60</span> seconds. Save your progress.</p>
-      </div>
-      <button class="btn btn-sm btn-primary" onclick="extendSession()">Extend Session</button>
-    </div>
-  </div>
-
+  
   <div class="bg-orbs" aria-hidden="true">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>

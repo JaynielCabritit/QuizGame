@@ -1,334 +1,3 @@
-/* ===== SECURITY MODULE ===== */
-const SecurityModule = (function() {
-  'use strict';
-  
-  // DevTools detection
-  let devToolsOpen = false;
-  let warningShown = false;
-  const WARNING_COOLDOWN = 30000; // 30 seconds cooldown
-  
-  // Multiple detection methods
-  function detectDevTools() {
-    const threshold = 160;
-    
-    // Method 1: Window size comparison
-    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-    
-    // Method 2: Performance timing detection
-    const start = performance.now();
-    debugger;
-    const end = performance.now();
-    const debuggerDetected = end - start > 100;
-    
-    // Method 3: Console inspection
-    const consoleDetected = (function() {
-      const element = new Image();
-      Object.defineProperty(element, 'id', {
-        get: function() {
-          devToolsOpen = true;
-          return '';
-        }
-      });
-      console.log(element);
-      return devToolsOpen;
-    })();
-    
-    return widthThreshold || heightThreshold || debuggerDetected || consoleDetected;
-  }
-  
-  function showSecurityWarning() {
-    if (warningShown) return;
-    warningShown = true;
-    
-    const overlay = document.getElementById('security-overlay');
-    overlay.classList.remove('hidden');
-    
-    // Log security event
-    logSecurityEvent('DEVTOOLS_DETECTED');
-    
-    // Pause quiz timer if active
-    if (window.clearTimer && typeof window.clearTimer === 'function') {
-      window.clearTimer();
-    }
-    
-    // Schedule cooldown reset
-    setTimeout(() => {
-      warningShown = false;
-    }, WARNING_COOLDOWN);
-  }
-  
-  function logSecurityEvent(type) {
-    const events = JSON.parse(sessionStorage.getItem('security_events') || '[]');
-    events.push({
-      type: type,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent
-    });
-    sessionStorage.setItem('security_events', JSON.stringify(events.slice(-50)));
-  }
-  
-  // Anti-cheat measures
-  function preventTabSwitch() {
-    let blurCount = 0;
-    const MAX_BLUR = 3; // Maximum allowed tab switches during quiz
-    
-    window.addEventListener('blur', () => {
-      const activeScreen = document.getElementById('screen-quiz');
-      if (activeScreen && activeScreen.classList.contains('active')) {
-        blurCount++;
-        sessionStorage.setItem('tab_switch_count', blurCount);
-        
-        if (blurCount > MAX_BLUR) {
-          logSecurityEvent('EXCESSIVE_TAB_SWITCH');
-          alert('⚠️ Excessive tab switching detected. Quiz may be invalidated.');
-        }
-      }
-    });
-  }
-  
-  // Prevent text selection during quiz
-  function preventTextSelection() {
-    document.addEventListener('selectstart', (e) => {
-      const quizScreen = document.getElementById('screen-quiz');
-      if (quizScreen.classList.contains('active')) {
-        e.preventDefault();
-      }
-    });
-  }
-  
-  // Right-click prevention on quiz elements
-  function preventRightClick() {
-    document.addEventListener('contextmenu', (e) => {
-      if (e.target.closest('#screen-quiz')) {
-        e.preventDefault();
-        return false;
-      }
-    });
-  }
-  
-  // Keyboard shortcut prevention
-  function preventKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-      const quizScreen = document.getElementById('screen-quiz');
-      if (!quizScreen.classList.contains('active')) return;
-      
-      // Block common shortcuts
-      const blockedCombinations = [
-        (e.ctrlKey && e.key === 'u'),      // View source
-        (e.ctrlKey && e.key === 's'),      // Save page
-        (e.ctrlKey && e.key === 'p'),      // Print
-        (e.ctrlKey && e.shiftKey && e.key === 'i'), // DevTools
-        (e.ctrlKey && e.shiftKey && e.key === 'j'), // Console
-        (e.ctrlKey && e.shiftKey && e.key === 'c'), // Inspect element
-        (e.key === 'F12'),                 // DevTools key
-      ];
-      
-      if (blockedCombinations.some(combo => combo)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    });
-  }
-  
-  // Session management
-  let sessionTimeout;
-  const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
-  const WARNING_BEFORE = 60 * 1000; // Show warning 1 minute before
-  
-  function startSession() {
-    const sessionStart = Date.now();
-    sessionStorage.setItem('session_start', sessionStart);
-    resetSessionTimer();
-  }
-  
-  function resetSessionTimer() {
-    if (sessionTimeout) clearTimeout(sessionTimeout);
-    
-    const sessionStart = parseInt(sessionStorage.getItem('session_start'));
-    const elapsed = Date.now() - sessionStart;
-    const remaining = SESSION_DURATION - elapsed;
-    
-    if (remaining <= 0) {
-      endSession();
-      return;
-    }
-    
-    // Show warning before session expires
-    if (remaining <= WARNING_BEFORE) {
-      showSessionWarning(Math.ceil(remaining / 1000));
-    }
-    
-    sessionTimeout = setTimeout(() => {
-      endSession();
-    }, remaining);
-  }
-  
-  function showSessionWarning(seconds) {
-    const warningEl = document.getElementById('session-warning');
-    const countdownEl = document.getElementById('session-countdown');
-    
-    warningEl.classList.remove('hidden');
-    
-    const countdown = setInterval(() => {
-      seconds--;
-      countdownEl.textContent = seconds;
-      
-      if (seconds <= 0) {
-        clearInterval(countdown);
-        warningEl.classList.add('hidden');
-      }
-    }, 1000);
-  }
-  
-  function extendSession() {
-    sessionStorage.setItem('session_start', Date.now());
-    document.getElementById('session-warning').classList.add('hidden');
-    resetSessionTimer();
-  }
-  
-  function endSession() {
-    sessionStorage.clear();
-    document.getElementById('session-warning').classList.add('hidden');
-    alert('⚠️ Your session has expired. Please start again.');
-    window.location.reload();
-  }
-  
-  // Secure storage wrapper
-  const SecureStorage = {
-    setItem(key, value, encrypted = false) {
-      try {
-        const data = encrypted ? btoa(JSON.stringify(value)) : JSON.stringify(value);
-        const storageData = {
-          value: data,
-          timestamp: Date.now(),
-          encrypted: encrypted,
-          signature: this.generateSignature(data)
-        };
-        sessionStorage.setItem(key, JSON.stringify(storageData));
-      } catch (e) {
-        console.error('Storage error:', e);
-      }
-    },
-    
-    getItem(key) {
-      try {
-        const raw = sessionStorage.getItem(key);
-        if (!raw) return null;
-        
-        const storageData = JSON.parse(raw);
-        
-        // Verify integrity
-        if (storageData.signature !== this.generateSignature(storageData.value)) {
-          console.warn('Storage integrity check failed for:', key);
-          return null;
-        }
-        
-        const value = storageData.encrypted ? 
-          JSON.parse(atob(storageData.value)) : 
-          JSON.parse(storageData.value);
-        
-        return value;
-      } catch (e) {
-        console.error('Storage retrieval error:', e);
-        return null;
-      }
-    },
-    
-    removeItem(key) {
-      sessionStorage.removeItem(key);
-    },
-    
-    generateSignature(data) {
-      let hash = 0;
-      for (let i = 0; i < data.length; i++) {
-        const char = data.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      return hash.toString(36);
-    }
-  };
-  
-  // Navigation guard
-  function guardNavigation(targetScreen) {
-    const currentScreen = document.querySelector('.screen.active');
-    const currentId = currentScreen ? currentScreen.id : '';
-    
-    // Prevent direct access to quiz without registration
-    if (targetScreen === 'screen-quiz' && !sessionStorage.getItem('quiz_authorized')) {
-      console.warn('Unauthorized quiz access attempt');
-      return 'screen-landing';
-    }
-    
-    // Prevent direct access to admin without login
-    if (targetScreen === 'screen-admin' && !sessionStorage.getItem('admin_authorized')) {
-      console.warn('Unauthorized admin access attempt');
-      return 'screen-landing';
-    }
-    
-    // Prevent bypassing registration
-    if (targetScreen === 'screen-select' && !sessionStorage.getItem('user_registered')) {
-      return 'screen-registration';
-    }
-    
-    return targetScreen;
-  }
-  
-  // Initialize security
-  function init() {
-    // DevTools detection
-    setInterval(() => {
-      if (detectDevTools() && !devToolsOpen) {
-        devToolsOpen = true;
-        showSecurityWarning();
-      }
-    }, 1000);
-    
-    // Anti-cheat measures
-    preventTabSwitch();
-    preventTextSelection();
-    preventRightClick();
-    preventKeyboardShortcuts();
-    
-    // Start session management
-    startSession();
-    
-    // Log initialization
-    logSecurityEvent('SECURITY_INIT');
-    
-    console.log('🔒 Security module initialized');
-  }
-  
-  return {
-    init: init,
-    guardNavigation: guardNavigation,
-    extendSession: extendSession,
-    SecureStorage: SecureStorage,
-    resetSessionTimer: resetSessionTimer,
-    logSecurityEvent: logSecurityEvent
-  };
-})();
-
-/* ===== RESTORE ACCESS FUNCTION ===== */
-function restoreAccess() {
-  document.getElementById('security-overlay').classList.add('hidden');
-  SecurityModule.logSecurityEvent('ACCESS_RESTORED');
-  SecurityModule.resetSessionTimer();
-}
-
-/* ===== EXTEND SESSION (exposed globally) ===== */
-function extendSession() {
-  SecurityModule.extendSession();
-}
-
-/* ===== NAVIGATION GUARD WRAPPER ===== */
-function navigateBack(targetScreen) {
-  const guardedScreen = SecurityModule.guardNavigation(targetScreen);
-  showScreen(guardedScreen);
-}
-
 /* ===== FIREBASE CONFIGURATION ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyCgiq_ELCKRUHRMOw9PCoZenl-BA2wwifg",
@@ -450,125 +119,14 @@ let userProfile = {
   group: ''
 };
 
-/* ===== STATE PERSISTENCE WITH SECURE STORAGE ===== */
-function saveAppState() {
-  const state = {
-    currentScreen: getCurrentScreen(),
-    adminLoggedIn: adminLoggedIn,
-    currentUser: currentUser,
-    userProfile: userProfile,
-    selectedGroup: selectedGroup,
-    currentQuizId: currentQuiz ? currentQuiz.id : null,
-    currentQIndex: currentQIndex,
-    userAnswers: userAnswers,
-    answered: answered,
-    timeLeft: timeLeft,
-    lastResultsData: null
-  };
-  
-  if (getCurrentScreen() === 'screen-results') {
-    const scoreNum = document.getElementById('score-num').textContent;
-    const statCorrect = document.getElementById('stat-correct').textContent;
-    const statIncorrect = document.getElementById('stat-incorrect').textContent;
-    const statSkipped = document.getElementById('stat-skipped').textContent;
-    const reviewList = document.getElementById('review-list').innerHTML;
-    const resultsEmoji = document.getElementById('results-emoji').textContent;
-    const resultsTitle = document.getElementById('results-title').textContent;
-    const resultsSubtitle = document.getElementById('results-subtitle').textContent;
-    
-    state.lastResultsData = {
-      scoreNum, statCorrect, statIncorrect, statSkipped,
-      reviewList, resultsEmoji, resultsTitle, resultsSubtitle
-    };
-  }
-  
-  SecurityModule.SecureStorage.setItem('medtech_app_state', state, true);
-  
-  // Set authorization flags
-  if (currentUser) {
-    sessionStorage.setItem('user_registered', 'true');
-  }
-  if (currentQuiz) {
-    sessionStorage.setItem('quiz_authorized', 'true');
-  }
-  if (adminLoggedIn) {
-    sessionStorage.setItem('admin_authorized', 'true');
-  }
+/* ===== SIMPLE NAVIGATION ===== */
+function navigateBack(targetScreen) {
+  showScreen(targetScreen);
 }
 
-function getCurrentScreen() {
-  const activeScreen = document.querySelector('.screen.active');
-  return activeScreen ? activeScreen.id : 'screen-landing';
-}
-
-function restoreAppState() {
-  const state = SecurityModule.SecureStorage.getItem('medtech_app_state');
-  if (!state) return false;
-  
-  try {
-    if (state.adminLoggedIn) adminLoggedIn = true;
-    if (state.currentUser) currentUser = state.currentUser;
-    if (state.userProfile) userProfile = state.userProfile;
-    if (state.selectedGroup) selectedGroup = state.selectedGroup;
-    
-    if (state.currentQuizId) {
-      currentQuiz = QUIZZES.find(q => q.id === state.currentQuizId);
-      if (currentQuiz) {
-        currentQIndex = state.currentQIndex || 0;
-        userAnswers = state.userAnswers || new Array(currentQuiz.questions.length).fill(null);
-        answered = state.answered || false;
-        timeLeft = state.timeLeft || currentQuiz.timePerQ;
-      }
-    }
-    
-    if (state.currentScreen) {
-      const guardedScreen = SecurityModule.guardNavigation(state.currentScreen);
-      showScreen(guardedScreen);
-      
-      if (guardedScreen === 'screen-quiz' && currentQuiz) {
-        document.getElementById('quiz-title-bar').textContent = currentQuiz.title;
-        renderQuestion();
-      } else if (guardedScreen === 'screen-select' && currentUser) {
-        document.getElementById('greeting-name').textContent = `👋 Welcome, ${currentUser}!`;
-        renderQuizGrid();
-      } else if (guardedScreen === 'screen-admin' && adminLoggedIn) {
-        renderAdminDashboard();
-      }
-      
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('Error restoring app state:', error);
-    return false;
-  }
-}
-
-function clearAppState() {
-  SecurityModule.SecureStorage.removeItem('medtech_app_state');
-  sessionStorage.removeItem('user_registered');
-  sessionStorage.removeItem('quiz_authorized');
-  sessionStorage.removeItem('admin_authorized');
-}
-
-/* ===== INITIALIZE SECURITY ON LOAD ===== */
+/* ===== INITIALIZE ON LOAD ===== */
 window.addEventListener('DOMContentLoaded', function() {
-  SecurityModule.init();
-  
-  const restored = restoreAppState();
-  if (!restored) {
-    showScreen('screen-landing');
-  }
-  
-  window.addEventListener('beforeunload', function() {
-    saveAppState();
-  });
-  
-  setInterval(function() {
-    saveAppState();
-    SecurityModule.resetSessionTimer();
-  }, 5000);
+  showScreen('screen-landing');
 });
 
 /* ===== FIREBASE FUNCTIONS ===== */
@@ -590,7 +148,6 @@ async function saveResultToFirebase(result) {
     }
     
     const docRef = await db.collection('quizResults').add(result);
-    SecurityModule.logSecurityEvent('RESULT_SAVED');
     return docRef.id;
   } catch (error) {
     console.error('Error saving to Firebase: ', error);
@@ -619,7 +176,6 @@ async function getResultsFromFirebase() {
 async function deleteResultFromFirebase(firestoreId) {
   try {
     await db.collection('quizResults').doc(firestoreId).delete();
-    SecurityModule.logSecurityEvent('RESULT_DELETED');
   } catch (error) {
     console.error('Error deleting from Firebase: ', error);
   }
@@ -633,7 +189,6 @@ async function clearAllResultsFromFirebase() {
       batch.delete(doc.ref);
     });
     await batch.commit();
-    SecurityModule.logSecurityEvent('ALL_RESULTS_CLEARED');
   } catch (error) {
     console.error('Error clearing Firebase: ', error);
   }
@@ -641,26 +196,16 @@ async function clearAllResultsFromFirebase() {
 
 /* ===== SCREEN MANAGEMENT ===== */
 function showScreen(id) {
-  // Apply navigation guard
-  const guardedId = SecurityModule.guardNavigation(id);
-  
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(guardedId);
+  const el = document.getElementById(id);
   if (!el) {
-    console.error('Screen not found:', guardedId);
+    console.error('Screen not found:', id);
     return;
   }
   
   el.classList.add('active');
   el.style.animation = 'none';
   requestAnimationFrame(() => { el.style.animation = ''; });
-  
-  // Reset quiz authorization when leaving quiz
-  if (guardedId !== 'screen-quiz') {
-    // Don't remove authorization, just update the screen
-  }
-  
-  saveAppState();
 }
 
 /* ===== LANDING ===== */
@@ -691,7 +236,6 @@ function selectGroup(group) {
     opt.classList.toggle('selected', opt.textContent === group);
   });
   document.getElementById('group-select-trigger').classList.remove('error');
-  saveAppState();
 }
 
 function startGame() {
@@ -765,7 +309,6 @@ function startGame() {
     formError.classList.add('show');
     formError.style.animation = 'none';
     requestAnimationFrame(() => { formError.style.animation = 'shake 0.4s ease'; });
-    SecurityModule.logSecurityEvent('VALIDATION_FAILED');
     return;
   }
   
@@ -786,10 +329,6 @@ function startGame() {
   
   currentUser = displayName;
   document.getElementById('greeting-name').textContent = `👋 Welcome, ${displayName}!`;
-  
-  // Set registration flag
-  sessionStorage.setItem('user_registered', 'true');
-  SecurityModule.logSecurityEvent('USER_REGISTERED');
   
   renderQuizGrid();
   showScreen('screen-select');
@@ -821,7 +360,6 @@ document.addEventListener('input', function(e) {
     e.target.classList.remove('error');
     document.getElementById('form-error').classList.remove('show');
   }
-  saveAppState();
 });
 
 /* ===== QUIZ GRID ===== */
@@ -850,10 +388,6 @@ function startQuiz(idx) {
   userAnswers = new Array(currentQuiz.questions.length).fill(null);
   answered = false;
   isFinishing = false;
-  
-  // Set quiz authorization
-  sessionStorage.setItem('quiz_authorized', 'true');
-  SecurityModule.logSecurityEvent('QUIZ_STARTED');
   
   document.getElementById('quiz-title-bar').textContent = currentQuiz.title;
   showScreen('screen-quiz');
@@ -884,7 +418,6 @@ function renderQuestion() {
   fb.className = 'feedback-banner';
 
   startTimer(currentQuiz.timePerQ);
-  saveAppState();
 }
 
 /* ===== TIMER ===== */
@@ -1014,9 +547,6 @@ async function finishQuiz() {
   isFinishing = true;
   clearTimer();
   
-  // Remove quiz authorization
-  sessionStorage.removeItem('quiz_authorized');
-  
   const total = currentQuiz.questions.length;
   let correct = 0, incorrect = 0, skipped = 0;
 
@@ -1046,7 +576,6 @@ async function finishQuiz() {
     submissionId: generateSubmissionId(currentUser, currentQuiz.id)
   };
   
-  SecurityModule.logSecurityEvent('QUIZ_COMPLETED');
   await saveResultToFirebase(result);
   
   const stored = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
@@ -1110,8 +639,6 @@ function renderResults(correct, incorrect, skipped, total, pct) {
       <div class="review-explanation"><strong>💡 Explanation:</strong> ${sanitizeInput(q.explanation)}</div>
     </div>`;
   }).join('');
-  
-  saveAppState();
 }
 
 /* ===== CONFETTI ===== */
@@ -1148,10 +675,8 @@ function adminLogin() {
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
     errorDiv.classList.remove('show');
     adminLoggedIn = true;
-    sessionStorage.setItem('admin_authorized', 'true');
     document.getElementById('admin-username').value = '';
     document.getElementById('admin-password').value = '';
-    SecurityModule.logSecurityEvent('ADMIN_LOGIN');
     renderAdminDashboard();
     showScreen('screen-admin');
   } else {
@@ -1161,7 +686,6 @@ function adminLogin() {
     requestAnimationFrame(() => { errorDiv.style.animation = 'shake 0.4s ease'; });
     document.getElementById('admin-username').classList.add('error');
     document.getElementById('admin-password').classList.add('error');
-    SecurityModule.logSecurityEvent('ADMIN_LOGIN_FAILED');
     setTimeout(() => {
       document.getElementById('admin-username').classList.remove('error');
       document.getElementById('admin-password').classList.remove('error');
@@ -1171,13 +695,10 @@ function adminLogin() {
 
 function adminLogout() {
   adminLoggedIn = false;
-  sessionStorage.removeItem('admin_authorized');
   document.getElementById('admin-username').value = '';
   document.getElementById('admin-password').value = '';
   document.getElementById('admin-login-error').classList.remove('show');
-  SecurityModule.logSecurityEvent('ADMIN_LOGOUT');
   showScreen('screen-landing');
-  clearAppState();
 }
 
 /* ===== CLEAR ALL DATA ===== */
@@ -1260,7 +781,7 @@ async function renderAdminDashboard() {
   document.getElementById('stat-attempts').textContent = totalAttempts;
   document.getElementById('stat-avg').textContent = `${avgPct}%`;
   document.getElementById('stat-top').textContent = `${topScore}%`;
-  document.getElementById('result-count').textContent = `${totalAttempts} Record${totalAttempts !== 1 ? 's' : ''}`;
+  document.getElementById('result-count').textContent = '';
 
   const tbody = document.getElementById('admin-tbody');
   
@@ -1307,8 +828,7 @@ async function renderAdminDashboard() {
     </tr>`;
   }).join('');
   
-  const lastUpdated = new Date().toLocaleTimeString();
-  document.getElementById('result-count').textContent = `${totalAttempts} Record${totalAttempts !== 1 ? 's' : ''} • Updated ${lastUpdated}`;
+  document.getElementById('result-count').textContent = '';
 }
 
 /* ===== ADMIN DETAIL MODAL ===== */
