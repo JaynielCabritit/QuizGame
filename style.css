@@ -380,6 +380,13 @@ body {
   white-space: nowrap;
 }
 
+.btn-submit-answer {
+  margin-top: 12px;
+  padding: 12px 28px;
+  width: auto;
+  min-width: 160px;
+}
+
 /* ===== DIVIDER ===== */
 .divider {
   display: flex; align-items: center; gap: 12px; margin: 20px 0;
@@ -1002,7 +1009,7 @@ tbody tr:hover {
 .timer-ring.danger { stroke: var(--accent-coral); animation: timerPulse 0.5s ease infinite; }
 .timer-text {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--text-primary);
+  font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--text-primary);
 }
 
 .progress-bar-wrap { width: 100%; max-width: 800px; margin: 0 auto 24px; }
@@ -1027,47 +1034,57 @@ tbody tr:hover {
   color: var(--text-primary);
 }
 
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-.option-btn {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 20px; border: 2px solid rgba(139, 92, 246, 0.15);
-  border-radius: var(--radius-sm); background: var(--bg-card2);
-  color: var(--text-primary); cursor: pointer; transition: var(--transition);
-  font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700;
-  text-align: left; position: relative; overflow: hidden;
+/* ===== IDENTIFICATION AREA ===== */
+.identification-area {
+  display: block;
+  margin-top: 10px;
 }
-.option-btn:hover:not(:disabled) { transform: scale(1.03); border-color: rgba(139, 92, 246, 0.4); }
-.option-btn:active:not(:disabled) { transform: scale(0.98); }
-.option-btn:disabled { cursor: not-allowed; }
 
-.option-letter {
-  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Fredoka One', cursive; font-size: 1rem;
+.answer-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.answer-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-card2);
+  border: 2px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
   transition: var(--transition);
+  outline: none;
 }
-.opt-a .option-letter { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
-.opt-b .option-letter { background: rgba(167, 139, 250, 0.2); color: var(--accent-light-purple); }
-.opt-c .option-letter { background: rgba(196, 181, 253, 0.2); color: var(--accent-lavender); }
-.opt-d .option-letter { background: rgba(245, 243, 255, 0.2); color: var(--accent-white); }
 
-.option-btn.correct {
-  border-color: var(--correct) !important;
-  background: rgba(16, 185, 129, 0.12) !important;
-  animation: popIn 0.4s ease;
+.answer-input:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
-.option-btn.correct .option-letter { background: var(--correct); color: white; }
 
-.option-btn.incorrect {
-  border-color: var(--incorrect) !important;
-  background: rgba(239, 68, 68, 0.12) !important;
-  animation: shake 0.4s ease;
+.answer-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
-.option-btn.incorrect .option-letter { background: var(--incorrect); color: white; }
 
-.option-btn.dimmed { opacity: 0.35; }
+.answer-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-weight: 400;
+}
 
+/* ===== OPTIONS GRID - hidden for identification ===== */
+.options-grid {
+  display: none;
+}
+
+/* ===== FEEDBACK BANNER ===== */
 .feedback-banner {
   display: none; align-items: center; gap: 12px;
   padding: 14px 18px; border-radius: var(--radius-sm);
@@ -1300,6 +1317,10 @@ tbody tr:hover {
   .table-scroll {
     font-size: 0.85rem;
   }
+  
+  .btn-submit-answer {
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1323,10 +1344,6 @@ tbody tr:hover {
   
   .quiz-header { 
     justify-content: center; 
-  }
-  
-  .options-grid { 
-    grid-template-columns: 1fr; 
   }
   
   .dashboard-stats {
@@ -1390,6 +1407,12 @@ tbody tr:hover {
     padding: 14px 20px;
     font-size: 1rem;
   }
+  
+  .btn-submit-answer {
+    padding: 14px 20px;
+    font-size: 1rem;
+    width: 100%;
+  }
 
   .motivation-content {
     flex-direction: column;
@@ -1411,6 +1434,10 @@ tbody tr:hover {
   .auto-advance-indicator {
     font-size: 0.8rem;
     padding: 10px 16px;
+  }
+  
+  .timer-text {
+    font-size: 1rem;
   }
 }
 
@@ -1460,6 +1487,15 @@ tbody tr:hover {
   
   .form-row {
     margin-bottom: 12px;
+  }
+  
+  .answer-input {
+    font-size: 0.9rem;
+    padding: 12px 14px;
+  }
+  
+  .question-text {
+    font-size: 1.1rem;
   }
 }
 
@@ -1519,14 +1555,9 @@ tbody tr:hover {
   cursor: not-allowed;
 }
 
-/* Spinning animation for refresh icon */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .spin-icon {
@@ -1534,43 +1565,29 @@ tbody tr:hover {
   animation: spin 1s linear infinite;
 }
 
-/* Smooth transitions for stat cards during refresh */
 .stat-card-value {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Highlight effect when new data arrives */
 @keyframes highlightUpdate {
-  0% {
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
 }
 
 .stat-card-updated {
   animation: highlightUpdate 1s ease;
 }
 
-/* Table row animation for refreshed data */
 @keyframes rowUpdate {
-  from {
-    background-color: rgba(139, 92, 246, 0.15);
-  }
-  to {
-    background-color: transparent;
-  }
+  from { background-color: rgba(139, 92, 246, 0.15); }
+  to { background-color: transparent; }
 }
 
 tbody tr.new-row {
   animation: rowUpdate 1.5s ease, slideUp 0.3s ease forwards;
 }
 
-/* Update stat cards during refresh */
 .stat-card {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
               box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1581,30 +1598,18 @@ tbody tr.new-row {
   box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2);
 }
 
-/* Refresh indicator pulse */
 @keyframes refreshPulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .refreshing-indicator {
   animation: refreshPulse 1s ease infinite;
 }
 
-/* Dashboard stats animation for smooth number transitions */
 @keyframes countUp {
-  from {
-    opacity: 0.5;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0.5; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .stat-updated {

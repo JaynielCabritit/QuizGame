@@ -9,119 +9,112 @@ const firebaseConfig = {
   measurementId: "G-TZ3D6NYCYD"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* ===== ADMIN CONFIGURATION ===== */
+db.enablePersistence().catch(function(err) {
+  console.warn('Firestore persistence error:', err);
+});
+
 const ADMIN_CREDENTIALS = {
   username: 'admin',
   password: 'pass123'
 };
 
-/* ===== QUIZ DATABASE ===== */
-const QUIZZES = [
+const LOGIN_ATTEMPTS = {
+  count: 0,
+  maxAttempts: 5,
+  lockoutTime: 30000,
+  lockoutUntil: 0
+};
+
+/* ===== QUIZ DATA - Case 1 Identification ===== */
+// Based on "CASE 1 AY 2026-2027 PRELIMS.pdf"
+const QUIZZES = Object.freeze([
   {
     id: 'case1',
     title: '📋 CASE 1: Principles in Medical Laboratory Science',
-    desc: 'A case scenario involving Charles, a phlebotomist, and Mr. Robert Charles, a 58-year-old male patient with suspected sepsis. Answer 8 guide questions covering vascular system, venipuncture techniques, specimen collection, and quality assurance.',
+    desc: 'A case scenario involving Charles, a phlebotomist, and Mr. Robert Charles, a 58-year-old male patient with suspected sepsis. Answer 10 identification questions covering vascular system, venipuncture techniques, specimen collection, and quality assurance.',
     icon: '📋',
     color: '--accent-purple',
     cardAccent: 'rgba(139, 92, 246, 0.08)',
     difficulty: 'medium',
-    timePerQ: 45,
-    questions: [
+    timePerQ: 90, // 90 seconds total for all 10 questions
+    // 10 Identification questions based on the PDF
+    questions: Object.freeze([
       {
         q: "What is the primary function of capillaries in the vascular system?",
-        opts: [
-          "Transport oxygenated blood away from the heart",
-          "Facilitate exchange of nutrients and waste at cellular level",
-          "Return deoxygenated blood back to the heart",
-          "Regulate blood pressure through vasoconstriction"
-        ],
-        answer: 1,
-        explanation: "Capillaries are microscopic vessels that connect arterioles and venules, enabling the exchange of oxygen, nutrients, and waste products between blood and tissues. This exchange is essential for cellular metabolism and maintaining tissue health."
+        type: "identification",
+        answer: "exchange of nutrients and waste",
+        acceptableAnswers: ["exchange of nutrients and waste", "exchange of nutrients", "capillary exchange", "exchange of gases and nutrients", "nutrient and waste exchange"],
+        explanation: "Capillaries are microscopic vessels that connect arterioles and venules, enabling the exchange of oxygen, nutrients, and waste products between blood and tissues."
       },
       {
-        q: "Which factor in the patient's history most significantly contributed to difficult venipuncture?",
-        opts: [
-          "The patient's age of 58 years",
-          "Repeated vomiting and dehydration",
-          "Mild confusion and weakness",
-          "Three days of fever and chills"
-        ],
-        answer: 1,
-        explanation: "Dehydration from repeated vomiting and inability to eat/drink causes veins to collapse and become less visible, significantly reducing blood volume and venous pressure. This makes vein selection, palpation, and successful cannulation extremely challenging."
+        q: "What condition in Mr. Robert Charles's history most significantly contributed to difficult venipuncture?",
+        type: "identification",
+        answer: "dehydration",
+        acceptableAnswers: ["dehydration", "repeated vomiting and dehydration", "severe dehydration", "fluid volume deficit"],
+        explanation: "Dehydration from repeated vomiting and inability to eat/drink causes veins to collapse and become less visible, significantly reducing blood volume and venous pressure."
       },
       {
         q: "What alternative technique should Charles use for a patient with difficult veins?",
-        opts: [
-          "Use a larger gauge needle (18G) for better flow",
-          "Apply warm compresses to dilate veins before collection",
-          "Perform venipuncture on the patient's foot without consulting physician",
-          "Keep the patient's arm elevated above heart level"
-        ],
-        answer: 1,
-        explanation: "Warm compresses applied for 5-10 minutes promote vasodilation, making veins more prominent and easier to access. This is especially helpful for patients with poor venous access due to dehydration or previous difficult draws."
+        type: "identification",
+        answer: "warm compresses",
+        acceptableAnswers: ["warm compresses", "apply warm compresses", "warming the site", "warm compress", "heat application"],
+        explanation: "Warm compresses applied for 5-10 minutes promote vasodilation, making veins more prominent and easier to access."
       },
       {
         q: "What should Charles prioritize when encountering a failed blood draw in a severely dehydrated patient?",
-        opts: [
-          "Continue attempting at the same site until successful",
-          "Prioritize critical tests for sepsis evaluation",
-          "Abandon all testing and send the patient home",
-          "Perform all tests using only capillary blood"
-        ],
-        answer: 1,
-        explanation: "When limited blood can be obtained, Charles should prioritize the most critical tests needed for sepsis evaluation (blood cultures and lactate), while balancing patient safety and comfort. Clinical laboratory science knowledge helps determine test urgency and appropriate collection methods."
+        type: "identification",
+        answer: "prioritize critical tests",
+        acceptableAnswers: ["prioritize critical tests", "prioritize sepsis tests", "blood cultures and lactate", "critical tests", "prioritize essential tests"],
+        explanation: "When limited blood can be obtained, Charles should prioritize the most critical tests needed for sepsis evaluation (blood cultures and lactate)."
       },
       {
         q: "How many venipuncture attempts should be made before seeking assistance from another phlebotomist?",
-        opts: [
-          "Maximum of 2-3 attempts",
-          "Maximum of 5-7 attempts",
-          "Continue until successful regardless of attempts",
-          "Only 1 attempt is allowed"
-        ],
-        answer: 0,
-        explanation: "The protocol recommends a maximum of 2-3 venipuncture attempts per phlebotomist. Excessive attempts cause unnecessary patient trauma, discomfort, and can damage veins, making future collections more difficult. After 2-3 unsuccessful attempts, seeking assistance from an experienced colleague is appropriate."
+        type: "identification",
+        answer: "2-3 attempts",
+        acceptableAnswers: ["2-3", "2 to 3", "2-3 attempts", "two to three", "2 or 3", "maximum of 3"],
+        explanation: "The protocol recommends a maximum of 2-3 venipuncture attempts per phlebotomist. Excessive attempts cause unnecessary patient trauma."
       },
       {
-        q: "Which tube type is correctly matched with its corresponding test?",
-        opts: [
-          "Lavender top tube for PT/Protime testing",
-          "Light blue top tube for Complete Blood Count",
-          "Gray top tube for Blood Glucose collection",
-          "Red top tube for Blood Cultures"
-        ],
-        answer: 2,
-        explanation: "Gray top tubes contain sodium fluoride and potassium oxalate, which preserve glucose by inhibiting glycolysis. This is essential for accurate blood glucose testing. CBC requires lavender top (EDTA), PT requires light blue top (citrate), and blood cultures require dedicated culture bottles."
+        q: "Which tube type is correctly used for blood glucose collection?",
+        type: "identification",
+        answer: "gray top tube",
+        acceptableAnswers: ["gray top", "gray top tube", "gray", "grey top", "sodium fluoride tube"],
+        explanation: "Gray top tubes contain sodium fluoride and potassium oxalate, which preserve glucose by inhibiting glycolysis."
       },
       {
         q: "What pre-analytical factor most significantly affects PT/Protime test accuracy?",
-        opts: [
-          "Patient's emotional state during collection",
-          "Proper blood-to-anticoagulant ratio (9:1)",
-          "Time of day when blood is collected",
-          "Patient's body temperature during collection"
-        ],
-        answer: 1,
-        explanation: "PT testing requires a precise 9:1 blood-to-sodium citrate ratio. Underfilling or overfilling the tube alters this ratio, leading to inaccurate results. Other critical factors include proper mixing, timely processing (within 4-6 hours), and avoiding hemolysis."
+        type: "identification",
+        answer: "blood-to-anticoagulant ratio",
+        acceptableAnswers: ["blood-to-anticoagulant ratio", "9:1 ratio", "proper ratio", "correct blood to citrate ratio", "anticoagulant ratio"],
+        explanation: "PT testing requires a precise 9:1 blood-to-sodium citrate ratio. Underfilling or overfilling the tube alters this ratio, leading to inaccurate results."
       },
       {
         q: "How do CPD programs improve venipuncture success rates in a laboratory?",
-        opts: [
-          "They only focus on administrative documentation tasks",
-          "They provide ongoing education on updated techniques and patient assessment",
-          "They eliminate the need for competency assessments",
-          "They replace all hands-on training with online modules"
-        ],
-        answer: 1,
-        explanation: "Continuing Professional Development programs provide ongoing education through workshops, simulation training, and case reviews. This ensures phlebotomists maintain current clinical skills, learn from adverse events, and improve first-stick success rates through continuous skill development."
+        type: "identification",
+        answer: "ongoing education and training",
+        acceptableAnswers: ["ongoing education", "continuing education", "professional development", "ongoing training", "CPD", "continuous skill development"],
+        explanation: "Continuing Professional Development programs provide ongoing education through workshops, simulation training, and case reviews to maintain current clinical skills."
+      },
+      {
+        q: "What is the primary function of veins in the vascular system?",
+        type: "identification",
+        answer: "return blood to the heart",
+        acceptableAnswers: ["return blood to the heart", "return deoxygenated blood", "venous return", "transport blood back to heart", "blood return"],
+        explanation: "Veins are blood vessels that return deoxygenated blood from the body's tissues back to the heart."
+      },
+      {
+        q: "What effect does the patient's inability to eat and drink have on blood glucose testing?",
+        type: "identification",
+        answer: "glycolysis continues",
+        acceptableAnswers: ["glycolysis continues", "glucose decreases", "glucose levels drop", "continued glycolysis", "glucose breakdown"],
+        explanation: "When a patient cannot eat, glycolysis continues in the blood sample, which can falsely lower glucose levels unless proper preservatives are used."
       }
-    ]
+    ])
   }
-];
+]);
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 const OPT_CLASSES = ['opt-a', 'opt-b', 'opt-c', 'opt-d'];
@@ -133,6 +126,7 @@ let currentQIndex = 0;
 let userAnswers = [];
 let timerInterval = null;
 let timeLeft = 0;
+let timerStartTimestamp = null;
 let answered = false;
 let adminLoggedIn = false;
 let deleteTargetId = null;
@@ -146,6 +140,274 @@ let userProfile = {
   section: '',
   group: ''
 };
+let quizStartTime = null; // Track when quiz started for persistence
+let totalQuizTime = 90; // 90 seconds total
+
+let sessionTimeout = null;
+const SESSION_DURATION = 3600000;
+
+/* ===== STATE PERSISTENCE ===== */
+const STORAGE_KEY = 'medtech_quiz_state';
+
+function saveQuizState() {
+  try {
+    const state = {
+      currentUser,
+      userProfile,
+      selectedGroup,
+      currentQuiz: currentQuiz ? {
+        id: currentQuiz.id,
+        title: currentQuiz.title,
+        desc: currentQuiz.desc,
+        icon: currentQuiz.icon,
+        color: currentQuiz.color,
+        cardAccent: currentQuiz.cardAccent,
+        difficulty: currentQuiz.difficulty,
+        timePerQ: currentQuiz.timePerQ,
+        questions: currentQuiz.questions.map(q => ({
+          q: q.q,
+          type: q.type,
+          answer: q.answer,
+          acceptableAnswers: q.acceptableAnswers,
+          explanation: q.explanation
+        }))
+      } : null,
+      currentQIndex,
+      userAnswers,
+      answered,
+      timeLeft,
+      timerStartTimestamp,
+      isFinishing,
+      quizStartTime,
+      totalQuizTime,
+      quizStarted: currentQuiz !== null,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Failed to save quiz state:', e);
+  }
+}
+
+function loadQuizState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return null;
+    const state = JSON.parse(saved);
+    if (Date.now() - state.timestamp > 86400000) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return state;
+  } catch (e) {
+    console.warn('Failed to load quiz state:', e);
+    return null;
+  }
+}
+
+function clearQuizState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.warn('Failed to clear quiz state:', e);
+  }
+}
+
+function restoreQuizState() {
+  const state = loadQuizState();
+  if (!state || !state.quizStarted || !state.currentQuiz) {
+    return false;
+  }
+  
+  try {
+    currentUser = state.currentUser;
+    userProfile = state.userProfile;
+    selectedGroup = state.selectedGroup || '';
+    
+    currentQuiz = {
+      id: state.currentQuiz.id,
+      title: state.currentQuiz.title,
+      desc: state.currentQuiz.desc,
+      icon: state.currentQuiz.icon,
+      color: state.currentQuiz.color,
+      cardAccent: state.currentQuiz.cardAccent,
+      difficulty: state.currentQuiz.difficulty,
+      timePerQ: state.currentQuiz.timePerQ,
+      questions: state.currentQuiz.questions.map(q => ({
+        q: q.q,
+        type: q.type || 'identification',
+        answer: q.answer,
+        acceptableAnswers: q.acceptableAnswers || [q.answer],
+        explanation: q.explanation
+      }))
+    };
+    
+    currentQIndex = state.currentQIndex;
+    userAnswers = [...state.userAnswers];
+    answered = state.answered || false;
+    timeLeft = state.timeLeft || totalQuizTime;
+    timerStartTimestamp = state.timerStartTimestamp || null;
+    isFinishing = state.isFinishing || false;
+    quizStartTime = state.quizStartTime || null;
+    totalQuizTime = state.totalQuizTime || 90;
+    
+    // Calculate actual remaining time based on elapsed time
+    if (!answered && quizStartTime) {
+      const elapsed = (Date.now() - quizStartTime) / 1000;
+      const remaining = Math.max(0, Math.floor(totalQuizTime - elapsed));
+      timeLeft = remaining;
+      
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+      }
+    }
+    
+    document.getElementById('greeting-name').textContent = `👋 Welcome, ${safeHTML(currentUser)}!`;
+    showScreen('screen-quiz');
+    renderQuestionFromState();
+    return true;
+  } catch (e) {
+    console.error('Failed to restore quiz state:', e);
+    clearQuizState();
+    return false;
+  }
+}
+
+function renderQuestionFromState() {
+  const q = currentQuiz.questions[currentQIndex];
+  const total = currentQuiz.questions.length;
+  
+  // Check if time expired during reload
+  if (!answered && timeLeft <= 0) {
+    timeExpired();
+    return;
+  }
+  
+  document.getElementById('auto-advance-indicator').classList.remove('show');
+  document.getElementById('question-count').textContent = `Question ${currentQIndex + 1} of ${total}`;
+  document.getElementById('progress-fill').style.width = `${(currentQIndex / total) * 100}%`;
+  document.getElementById('question-text').textContent = q.q;
+  
+  // Show identification input
+  const idArea = document.getElementById('identification-area');
+  idArea.style.display = 'block';
+  const input = document.getElementById('answer-input');
+  input.value = '';
+  input.disabled = answered;
+  input.focus();
+  
+  const submitBtn = document.querySelector('.btn-submit-answer');
+  submitBtn.disabled = answered;
+  
+  // Hide options grid
+  document.getElementById('options-grid').style.display = 'none';
+  
+  // Show feedback if already answered
+  if (answered) {
+    const qData = currentQuiz.questions[currentQIndex];
+    const userAns = userAnswers[currentQIndex];
+    const isCorrect = userAns !== null && userAns !== '' && checkAnswer(userAns, qData);
+    const isSkipped = userAns === null || userAns === '';
+    
+    const fb = document.getElementById('feedback-banner');
+    const icon = document.getElementById('feedback-icon');
+    const text = document.getElementById('feedback-text');
+    
+    let msg;
+    if (isSkipped) {
+      msg = `⏰ Time's up! The correct answer was: ${safeHTML(qData.answer)}`;
+      fb.className = 'feedback-banner show incorrect-fb';
+      icon.textContent = '⏰';
+    } else if (isCorrect) {
+      msg = `🎉 Correct! Well done!`;
+      fb.className = 'feedback-banner show correct-fb';
+      icon.textContent = '✅';
+    } else {
+      msg = `❌ Not quite! The correct answer was: ${safeHTML(qData.answer)}`;
+      fb.className = 'feedback-banner show incorrect-fb';
+      icon.textContent = '💡';
+    }
+    text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${safeHTML(qData.explanation)}</span>`;
+    
+    document.getElementById('auto-advance-indicator').classList.add('show');
+    
+    if (!autoAdvanceTimeout && currentQIndex < currentQuiz.questions.length - 1) {
+      autoAdvanceTimeout = setTimeout(() => {
+        advanceQuestion();
+      }, 2000);
+    }
+  }
+  
+  // Start or resume timer if not answered
+  if (!answered) {
+    if (quizStartTime) {
+      const elapsed = (Date.now() - quizStartTime) / 1000;
+      const remaining = Math.max(0, Math.floor(totalQuizTime - elapsed));
+      timeLeft = remaining;
+      
+      if (timeLeft <= 0) {
+        timeExpired();
+        return;
+      }
+    }
+    startTimer(timeLeft);
+  } else {
+    updateTimerDisplay(timeLeft);
+  }
+  
+  saveQuizState();
+}
+
+function checkAnswer(input, qData) {
+  if (!input || input.trim() === '') return false;
+  const normalizedInput = input.trim().toLowerCase().replace(/\s+/g, ' ');
+  
+  // Check against acceptable answers
+  if (qData.acceptableAnswers) {
+    for (const ans of qData.acceptableAnswers) {
+      const normalizedAns = ans.toLowerCase().replace(/\s+/g, ' ');
+      if (normalizedInput === normalizedAns) return true;
+      // Check if input contains the key answer
+      if (normalizedInput.includes(normalizedAns) || normalizedAns.includes(normalizedInput)) {
+        // Only if the input is reasonably close
+        if (normalizedInput.length >= normalizedAns.length * 0.7) return true;
+      }
+    }
+  }
+  
+  // Direct match with main answer
+  const mainAnswer = qData.answer.toLowerCase().replace(/\s+/g, ' ');
+  if (normalizedInput === mainAnswer) return true;
+  
+  return false;
+}
+
+/* ===== SECURE FUNCTIONS ===== */
+function sanitizeInput(input) {
+  if (!input) return '';
+  const str = String(input);
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .replace(/`/g, '&#96;')
+    .trim();
+}
+
+function safeHTML(content) {
+  if (typeof content !== 'string') return '';
+  return sanitizeInput(content);
+}
+
+function generateSubmissionId(user, quizId) {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  const sanitizedUser = sanitizeInput(user).replace(/\s+/g, '_');
+  return `${sanitizedUser}_${quizId}_${timestamp}_${random}`;
+}
 
 /* ===== SIMPLE NAVIGATION ===== */
 function navigateBack(targetScreen) {
@@ -154,17 +416,42 @@ function navigateBack(targetScreen) {
 
 /* ===== INITIALIZE ON LOAD ===== */
 window.addEventListener('DOMContentLoaded', function() {
-  showScreen('screen-landing');
+  const restored = restoreQuizState();
+  if (!restored) {
+    showScreen('screen-landing');
+    clearQuizState();
+  }
+  clearSessionTimeout();
 });
 
-/* ===== FIREBASE FUNCTIONS ===== */
-function generateSubmissionId(user, quizId) {
-  return `${user.replace(/\s+/g, '_')}_${quizId}_${Date.now()}`;
+function resetSessionTimeout() {
+  clearSessionTimeout();
+  sessionTimeout = setTimeout(function() {
+    if (adminLoggedIn) {
+      adminLogout();
+      showScreen('screen-landing');
+    }
+  }, SESSION_DURATION);
 }
 
+function clearSessionTimeout() {
+  if (sessionTimeout) {
+    clearTimeout(sessionTimeout);
+    sessionTimeout = null;
+  }
+}
+
+document.addEventListener('click', resetSessionTimeout);
+document.addEventListener('keydown', resetSessionTimeout);
+document.addEventListener('touchstart', resetSessionTimeout);
+
+/* ===== FIREBASE FUNCTIONS ===== */
 async function saveResultToFirebase(result) {
   try {
-    result.submissionId = generateSubmissionId(result.user, result.quizId);
+    if (!result.user || !result.quizId || !result.submissionId) {
+      console.warn('Invalid result data, skipping save');
+      return null;
+    }
     
     const existingQuery = await db.collection('quizResults')
       .where('submissionId', '==', result.submissionId)
@@ -179,15 +466,18 @@ async function saveResultToFirebase(result) {
     return docRef.id;
   } catch (error) {
     console.error('Error saving to Firebase: ', error);
-    
-    const stored = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
-    const isDuplicate = stored.some(r => r.submissionId === result.submissionId);
-    
-    if (!isDuplicate) {
-      stored.push(result);
-      localStorage.setItem('medtech_quiz_results', JSON.stringify(stored));
+    try {
+      const stored = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
+      const isDuplicate = stored.some(r => r.submissionId === result.submissionId);
+      if (!isDuplicate && result.user && result.quizId) {
+        stored.push(result);
+        localStorage.setItem('medtech_quiz_results', JSON.stringify(stored));
+      }
+      return null;
+    } catch (storageError) {
+      console.error('LocalStorage save error:', storageError);
+      return null;
     }
-    return null;
   }
 }
 
@@ -197,11 +487,16 @@ async function getResultsFromFirebase() {
     return snapshot.docs.map(doc => ({...doc.data(), firestoreId: doc.id}));
   } catch (error) {
     console.error('Error reading from Firebase: ', error);
-    return JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
+    try {
+      return JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
+    } catch (storageError) {
+      return [];
+    }
   }
 }
 
 async function deleteResultFromFirebase(firestoreId) {
+  if (!firestoreId) return;
   try {
     await db.collection('quizResults').doc(firestoreId).delete();
   } catch (error) {
@@ -224,6 +519,13 @@ async function clearAllResultsFromFirebase() {
 
 /* ===== SCREEN MANAGEMENT ===== */
 function showScreen(id) {
+  const validScreens = ['screen-landing', 'screen-registration', 'screen-select', 
+                        'screen-quiz', 'screen-results', 'screen-admin-login', 'screen-admin'];
+  if (!validScreens.includes(id)) {
+    console.warn('Invalid screen ID:', id);
+    return;
+  }
+  
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (!el) {
@@ -239,11 +541,15 @@ function showScreen(id) {
 /* ===== LANDING ===== */
 function goToRegister() {
   showScreen('screen-registration');
-  setTimeout(() => { document.getElementById('first-name').focus(); }, 300);
+  setTimeout(() => { 
+    const nameInput = document.getElementById('first-name');
+    if (nameInput) nameInput.focus();
+  }, 300);
 }
 
 function goToAdminLogin() {
   showScreen('screen-admin-login');
+  document.getElementById('admin-login-error').classList.remove('show');
   setTimeout(() => document.getElementById('admin-username').focus(), 300);
 }
 
@@ -251,11 +557,21 @@ function goToAdminLogin() {
 function toggleGroupDropdown() {
   const dropdown = document.getElementById('group-dropdown');
   const trigger = document.getElementById('group-select-trigger');
+  if (!dropdown || !trigger) return;
+  
+  const isHidden = dropdown.classList.contains('hidden');
   dropdown.classList.toggle('hidden');
   trigger.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', !isHidden);
 }
 
 function selectGroup(group) {
+  const validGroups = ['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5', 'Group 6', 'Group 7', 'Group 8'];
+  if (!validGroups.includes(group)) {
+    console.warn('Invalid group selection');
+    return;
+  }
+  
   selectedGroup = group;
   document.getElementById('group-select-text').textContent = group;
   document.getElementById('group-dropdown').classList.add('hidden');
@@ -274,10 +590,9 @@ function startGame() {
   const formError = document.getElementById('form-error');
   const formErrorText = document.getElementById('form-error-text');
   
-  // Enhanced input validation
-  let errors = [];
+  document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
   
-  // Name validation (no numbers or special characters)
+  let errors = [];
   const nameRegex = /^[a-zA-Z\s\-']+$/;
   
   if (!firstName) {
@@ -289,12 +604,18 @@ function startGame() {
   } else if (firstName.length < 2) {
     errors.push('First Name must be at least 2 characters');
     document.getElementById('first-name').classList.add('error');
+  } else if (firstName.length > 30) {
+    errors.push('First Name must be 30 characters or less');
+    document.getElementById('first-name').classList.add('error');
   } else {
     document.getElementById('first-name').classList.remove('error');
   }
   
   if (middleName && !nameRegex.test(middleName)) {
     errors.push('Middle Name should only contain letters, spaces, hyphens, or apostrophes');
+    document.getElementById('middle-name').classList.add('error');
+  } else if (middleName && middleName.length > 30) {
+    errors.push('Middle Name must be 30 characters or less');
     document.getElementById('middle-name').classList.add('error');
   } else {
     document.getElementById('middle-name').classList.remove('error');
@@ -309,22 +630,26 @@ function startGame() {
   } else if (lastName.length < 2) {
     errors.push('Last Name must be at least 2 characters');
     document.getElementById('last-name').classList.add('error');
+  } else if (lastName.length > 30) {
+    errors.push('Last Name must be 30 characters or less');
+    document.getElementById('last-name').classList.add('error');
   } else {
     document.getElementById('last-name').classList.remove('error');
   }
   
-  // Section validation
   if (!section) {
     errors.push('Section is required');
     document.getElementById('section').classList.add('error');
   } else if (section.length > 10) {
     errors.push('Section must be 10 characters or less');
     document.getElementById('section').classList.add('error');
+  } else if (!/^[a-zA-Z0-9\s\-]+$/.test(section)) {
+    errors.push('Section contains invalid characters');
+    document.getElementById('section').classList.add('error');
   } else {
     document.getElementById('section').classList.remove('error');
   }
   
-  // Group validation
   if (!selectedGroup) {
     errors.push('Please select a group');
     document.getElementById('group-select-trigger').classList.add('error');
@@ -342,13 +667,12 @@ function startGame() {
   
   formError.classList.remove('show');
   
-  // Sanitize inputs
   userProfile = {
     firstName: sanitizeInput(firstName),
     middleName: sanitizeInput(middleName),
     lastName: sanitizeInput(lastName),
     section: sanitizeInput(section),
-    group: selectedGroup
+    group: sanitizeInput(selectedGroup)
   };
   
   const displayName = middleName 
@@ -356,30 +680,19 @@ function startGame() {
     : `${userProfile.firstName} ${userProfile.lastName}`;
   
   currentUser = displayName;
-  document.getElementById('greeting-name').textContent = `👋 Welcome, ${displayName}!`;
+  document.getElementById('greeting-name').textContent = `👋 Welcome, ${safeHTML(displayName)}!`;
   
   renderQuizGrid();
   showScreen('screen-select');
 }
 
-// Sanitize input to prevent XSS
-function sanitizeInput(input) {
-  if (!input) return '';
-  return input
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
-    .trim();
-}
-
 document.addEventListener('click', function(e) {
   const container = document.querySelector('.group-select-container');
   if (container && !container.contains(e.target)) {
-    document.getElementById('group-dropdown').classList.add('hidden');
-    document.getElementById('group-select-trigger').classList.remove('open');
+    const dropdown = document.getElementById('group-dropdown');
+    const trigger = document.getElementById('group-select-trigger');
+    if (dropdown) dropdown.classList.add('hidden');
+    if (trigger) trigger.classList.remove('open');
   }
 });
 
@@ -393,33 +706,71 @@ document.addEventListener('input', function(e) {
 /* ===== QUIZ GRID ===== */
 function renderQuizGrid() {
   const grid = document.getElementById('quiz-grid');
+  if (!grid) return;
+  
   const diffClasses = { easy: 'badge-diff-easy', medium: 'badge-diff-medium', hard: 'badge-diff-hard' };
   const diffLabels = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
-  grid.innerHTML = QUIZZES.map((q, i) => `
-    <div class="quiz-card" style="--card-accent:var(${q.color}); --card-bg-accent:${q.cardAccent}" onclick="startQuiz(${i})">
+  
+  grid.innerHTML = QUIZZES.map((q, i) => {
+    const title = safeHTML(q.title);
+    const desc = safeHTML(q.desc);
+    const diffLabel = diffLabels[q.difficulty] || '🟡 Medium';
+    const diffClass = diffClasses[q.difficulty] || 'badge-diff-medium';
+    
+    return `<div class="quiz-card" style="--card-accent:var(${q.color}); --card-bg-accent:${q.cardAccent}" onclick="startQuiz(${i})">
       <span class="quiz-card-icon">${q.icon}</span>
-      <div class="quiz-card-title">${q.title}</div>
-      <div class="quiz-card-desc">${q.desc}</div>
+      <div class="quiz-card-title">${title}</div>
+      <div class="quiz-card-desc">${desc}</div>
       <div class="quiz-card-meta">
         <span class="quiz-badge badge-questions">📋 ${q.questions.length} Questions</span>
-        <span class="quiz-badge badge-time">⏱️ ${q.timePerQ}s/Q</span>
-        <span class="quiz-badge ${diffClasses[q.difficulty]}">${diffLabels[q.difficulty]}</span>
+        <span class="quiz-badge badge-time">⏱️ ${Math.floor(q.timePerQ/60)}:${String(q.timePerQ%60).padStart(2,'0')}</span>
+        <span class="quiz-badge ${diffClass}">${diffLabel}</span>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 /* ===== START QUIZ ===== */
 function startQuiz(idx) {
-  currentQuiz = QUIZZES[idx];
+  if (!QUIZZES[idx]) {
+    console.warn('Invalid quiz index');
+    return;
+  }
+  
+  clearQuizState();
+  
+  const quizData = QUIZZES[idx];
+  currentQuiz = {
+    id: quizData.id,
+    title: quizData.title,
+    desc: quizData.desc,
+    icon: quizData.icon,
+    color: quizData.color,
+    cardAccent: quizData.cardAccent,
+    difficulty: quizData.difficulty,
+    timePerQ: quizData.timePerQ,
+    questions: quizData.questions.map(q => ({
+      q: q.q,
+      type: q.type || 'identification',
+      answer: q.answer,
+      acceptableAnswers: q.acceptableAnswers || [q.answer],
+      explanation: q.explanation
+    }))
+  };
+  
+  totalQuizTime = currentQuiz.timePerQ;
   currentQIndex = 0;
   userAnswers = new Array(currentQuiz.questions.length).fill(null);
   answered = false;
   isFinishing = false;
+  timeLeft = totalQuizTime;
+  quizStartTime = Date.now();
+  timerStartTimestamp = null;
   
-  document.getElementById('quiz-title-bar').textContent = currentQuiz.title;
+  document.getElementById('quiz-title-bar').textContent = safeHTML(currentQuiz.title);
   showScreen('screen-quiz');
   renderQuestion();
+  saveQuizState();
 }
 
 /* ===== RENDER QUESTION ===== */
@@ -427,57 +778,106 @@ function renderQuestion() {
   const q = currentQuiz.questions[currentQIndex];
   const total = currentQuiz.questions.length;
   answered = false;
-
+  
   document.getElementById('auto-advance-indicator').classList.remove('show');
-
+  
   document.getElementById('question-count').textContent = `Question ${currentQIndex + 1} of ${total}`;
   document.getElementById('progress-fill').style.width = `${(currentQIndex / total) * 100}%`;
   document.getElementById('question-text').textContent = q.q;
-
-  const grid = document.getElementById('options-grid');
-  grid.innerHTML = q.opts.map((opt, i) => `
-    <button class="option-btn ${OPT_CLASSES[i]}" onclick="selectAnswer(${i})" id="opt-${i}">
-      <div class="option-letter">${LETTERS[i]}</div>
-      <span>${opt}</span>
-    </button>
-  `).join('');
-
+  
+  // Show identification input
+  const idArea = document.getElementById('identification-area');
+  idArea.style.display = 'block';
+  const input = document.getElementById('answer-input');
+  input.value = '';
+  input.disabled = false;
+  input.focus();
+  
+  const submitBtn = document.querySelector('.btn-submit-answer');
+  submitBtn.disabled = false;
+  
+  // Hide options grid
+  document.getElementById('options-grid').style.display = 'none';
+  
   const fb = document.getElementById('feedback-banner');
   fb.className = 'feedback-banner';
-
-  startTimer(currentQuiz.timePerQ);
+  
+  // Calculate remaining time
+  if (quizStartTime) {
+    const elapsed = (Date.now() - quizStartTime) / 1000;
+    timeLeft = Math.max(0, Math.floor(totalQuizTime - elapsed));
+    if (timeLeft <= 0) {
+      timeExpired();
+      return;
+    }
+  }
+  
+  startTimer(timeLeft);
+  saveQuizState();
 }
 
 /* ===== TIMER ===== */
 function startTimer(seconds) {
   clearTimer();
-  timeLeft = seconds;
-  const ring = document.getElementById('timer-ring');
-  const text = document.getElementById('timer-text');
-  const circumference = 283;
-
-  ring.className = 'timer-ring';
-  ring.style.strokeDashoffset = '0';
-  text.textContent = seconds;
-  text.style.color = '';
-
+  
+  if (!quizStartTime) {
+    quizStartTime = Date.now();
+  }
+  
+  const elapsed = (Date.now() - quizStartTime) / 1000;
+  timeLeft = Math.max(0, Math.floor(totalQuizTime - elapsed));
+  
+  updateTimerDisplay(timeLeft);
+  
+  if (timeLeft <= 0) {
+    timeExpired();
+    return;
+  }
+  
   timerInterval = setInterval(() => {
     timeLeft--;
-    text.textContent = timeLeft;
-    ring.style.strokeDashoffset = `${circumference * (1 - timeLeft / seconds)}`;
-
-    if (timeLeft <= 5) { ring.className = 'timer-ring danger'; text.style.color = 'var(--accent-coral)'; }
-    else if (timeLeft <= Math.floor(seconds * 0.4)) { ring.className = 'timer-ring warning'; }
-
-    if (timeLeft <= 0) { clearTimer(); timeExpired(); }
+    updateTimerDisplay(timeLeft);
+    
+    if (timeLeft <= 0) {
+      clearTimer();
+      timeExpired();
+    }
+    
+    saveQuizState();
   }, 1000);
 }
 
-function clearTimer() { 
-  if (timerInterval) { 
-    clearInterval(timerInterval); 
-    timerInterval = null; 
-  } 
+function updateTimerDisplay(seconds) {
+  const ring = document.getElementById('timer-ring');
+  const text = document.getElementById('timer-text');
+  const circumference = 283;
+  
+  // Format as MM:SS
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  text.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+  
+  // Update ring
+  const progress = seconds / totalQuizTime;
+  ring.style.strokeDashoffset = `${circumference * (1 - progress)}`;
+  
+  if (seconds <= 10) {
+    ring.className = 'timer-ring danger';
+    text.style.color = 'var(--accent-coral)';
+  } else if (seconds <= Math.floor(totalQuizTime * 0.3)) {
+    ring.className = 'timer-ring warning';
+    text.style.color = 'var(--accent-yellow)';
+  } else {
+    ring.className = 'timer-ring';
+    text.style.color = '';
+  }
+}
+
+function clearTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   if (autoAdvanceTimeout) {
     clearTimeout(autoAdvanceTimeout);
     autoAdvanceTimeout = null;
@@ -485,69 +885,80 @@ function clearTimer() {
 }
 
 function timeExpired() {
-  if (answered) return;
+  if (answered || isFinishing) return;
   answered = true;
-  userAnswers[currentQIndex] = null;
+  
+  // If no answer recorded, mark as skipped
+  if (userAnswers[currentQIndex] === null || userAnswers[currentQIndex] === '') {
+    userAnswers[currentQIndex] = '';
+  }
+  
   const q = currentQuiz.questions[currentQIndex];
-  disableOptions();
-  highlightCorrect(q.answer);
-  showFeedback(false, `⏰ Time's up! The correct answer was: ${q.opts[q.answer]}`, q.explanation, true);
+  disableInput();
+  showFeedback(false, `⏰ Time's up! The correct answer was: ${safeHTML(q.answer)}`, q.explanation, true);
   
   document.getElementById('auto-advance-indicator').classList.add('show');
+  timerStartTimestamp = null;
+  saveQuizState();
   
   autoAdvanceTimeout = setTimeout(() => {
     advanceQuestion();
   }, 3000);
 }
 
-/* ===== SELECT ANSWER ===== */
-function selectAnswer(chosen) {
+/* ===== IDENTIFICATION ANSWER SUBMISSION ===== */
+function submitIdentificationAnswer() {
   if (answered) return;
+  
+  const input = document.getElementById('answer-input');
+  const answer = input.value.trim();
+  
+  if (answer === '') {
+    // Allow empty submission (will be marked as skipped)
+    // But we'll treat empty as skipped
+  }
+  
   answered = true;
   clearTimer();
-
+  
   const q = currentQuiz.questions[currentQIndex];
-  userAnswers[currentQIndex] = chosen;
-  const isCorrect = chosen === q.answer;
-
-  disableOptions();
-  const btn = document.getElementById(`opt-${chosen}`);
-  btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-  if (!isCorrect) highlightCorrect(q.answer);
-
-  q.opts.forEach((_, i) => {
-    if (i !== chosen && i !== q.answer) document.getElementById(`opt-${i}`).classList.add('dimmed');
-  });
-
+  userAnswers[currentQIndex] = answer;
+  
+  const isCorrect = checkAnswer(answer, q);
+  
+  disableInput();
+  
   const msg = isCorrect
     ? `🎉 Correct! Well done!`
-    : `❌ Not quite! The correct answer was: ${q.opts[q.answer]}`;
+    : `❌ Not quite! The correct answer was: ${safeHTML(q.answer)}`;
   showFeedback(isCorrect, msg, q.explanation, false);
   
   document.getElementById('auto-advance-indicator').classList.add('show');
+  timerStartTimestamp = null;
+  saveQuizState();
   
   autoAdvanceTimeout = setTimeout(() => {
     advanceQuestion();
   }, 2000);
 }
 
-function highlightCorrect(answerIdx) {
-  const btn = document.getElementById(`opt-${answerIdx}`);
-  if (btn) { btn.classList.add('correct'); btn.classList.remove('dimmed'); }
-}
-
-function disableOptions() {
-  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+function disableInput() {
+  const input = document.getElementById('answer-input');
+  input.disabled = true;
+  const submitBtn = document.querySelector('.btn-submit-answer');
+  submitBtn.disabled = true;
 }
 
 function showFeedback(correct, msg, explanation, skipped) {
   const fb = document.getElementById('feedback-banner');
   const icon = document.getElementById('feedback-icon');
   const text = document.getElementById('feedback-text');
-
+  
   fb.className = `feedback-banner show ${correct ? 'correct-fb' : 'incorrect-fb'}`;
   icon.textContent = correct ? '✅' : (skipped ? '⏰' : '💡');
-  text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${explanation}</span>`;
+  const safeMsg = safeHTML(msg);
+  const safeExplanation = safeHTML(explanation);
+  text.innerHTML = `${safeMsg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${safeExplanation}</span>`;
 }
 
 /* ===== ADVANCE QUESTION ===== */
@@ -562,6 +973,7 @@ function advanceQuestion() {
     finishQuiz();
   } else {
     renderQuestion();
+    saveQuizState();
   }
 }
 
@@ -574,31 +986,38 @@ async function finishQuiz() {
   
   isFinishing = true;
   clearTimer();
+  clearQuizState();
   
   const total = currentQuiz.questions.length;
   let correct = 0, incorrect = 0, skipped = 0;
-
+  
   userAnswers.forEach((ans, i) => {
-    if (ans === null) skipped++;
-    else if (ans === currentQuiz.questions[i].answer) correct++;
-    else incorrect++;
+    if (ans === null || ans === '') {
+      skipped++;
+    } else if (checkAnswer(ans, currentQuiz.questions[i])) {
+      correct++;
+    } else {
+      incorrect++;
+    }
   });
-
+  
   const pct = Math.round((correct / total) * 100);
-
+  
   const result = {
     id: Date.now(),
-    user: currentUser,
-    firstName: userProfile.firstName,
-    middleName: userProfile.middleName,
-    lastName: userProfile.lastName,
-    section: userProfile.section,
-    group: userProfile.group,
-    quiz: currentQuiz.title,
-    quizId: currentQuiz.id,
+    user: sanitizeInput(currentUser),
+    firstName: sanitizeInput(userProfile.firstName),
+    middleName: sanitizeInput(userProfile.middleName),
+    lastName: sanitizeInput(userProfile.lastName),
+    section: sanitizeInput(userProfile.section),
+    group: sanitizeInput(userProfile.group),
+    quiz: sanitizeInput(currentQuiz.title),
+    quizId: sanitizeInput(currentQuiz.id),
     score: `${correct}/${total}`,
-    correct, incorrect, skipped,
-    pct,
+    correct: correct,
+    incorrect: incorrect,
+    skipped: skipped,
+    pct: pct,
     answers: userAnswers.slice(),
     date: new Date().toLocaleString(),
     submissionId: generateSubmissionId(currentUser, currentQuiz.id)
@@ -606,14 +1025,17 @@ async function finishQuiz() {
   
   await saveResultToFirebase(result);
   
-  const stored = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
-  const isDuplicate = stored.some(r => r.submissionId === result.submissionId);
-  
-  if (!isDuplicate) {
-    stored.push(result);
-    localStorage.setItem('medtech_quiz_results', JSON.stringify(stored));
+  try {
+    const stored = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
+    const isDuplicate = stored.some(r => r.submissionId === result.submissionId);
+    if (!isDuplicate) {
+      stored.push(result);
+      localStorage.setItem('medtech_quiz_results', JSON.stringify(stored));
+    }
+  } catch (e) {
+    console.warn('LocalStorage backup failed:', e);
   }
-
+  
   renderResults(correct, incorrect, skipped, total, pct);
   showScreen('screen-results');
   if (pct >= 70) launchConfetti();
@@ -624,12 +1046,12 @@ async function finishQuiz() {
 /* ===== RENDER RESULTS ===== */
 function renderResults(correct, incorrect, skipped, total, pct) {
   let emoji, title, subtitle;
-  if (pct === 100) { emoji='🏆'; title='Perfect Score!'; subtitle='You mastered Teaching & Learning Strategies!'; }
+  if (pct === 100) { emoji='🏆'; title='Perfect Score!'; subtitle='You mastered the case study!'; }
   else if (pct >= 80) { emoji='🎉'; title='Excellent Work!'; subtitle='Strong understanding of the material!'; }
   else if (pct >= 60) { emoji='😊'; title='Good Job!'; subtitle='Solid performance — keep studying!'; }
-  else if (pct >= 40) { emoji='📚'; title='Keep Studying!'; subtitle='Review the material and try again!'; }
+  else if (pct >= 40) { emoji='📚'; title='Keep Studying!'; subtitle='Review the case and try again!'; }
   else { emoji='💪'; title="Don't Give Up!"; subtitle='Practice makes perfect — retry the quiz!'; }
-
+  
   document.getElementById('results-emoji').textContent = emoji;
   document.getElementById('results-title').textContent = title;
   document.getElementById('results-subtitle').textContent = subtitle;
@@ -637,34 +1059,45 @@ function renderResults(correct, incorrect, skipped, total, pct) {
   document.getElementById('stat-correct').textContent = correct;
   document.getElementById('stat-incorrect').textContent = incorrect;
   document.getElementById('stat-skipped').textContent = skipped;
-
+  
   const circle = document.getElementById('score-circle');
   circle.style.setProperty('--pct', `${pct}%`);
-
+  
   const banner = document.getElementById('motivation-banner');
   if (pct < 80) {
     banner.classList.add('show');
   } else {
     banner.classList.remove('show');
   }
-
+  
   const list = document.getElementById('review-list');
   list.innerHTML = currentQuiz.questions.map((q, i) => {
     const ua = userAnswers[i];
-    const isSkipped = ua === null;
-    const isCorrect = !isSkipped && ua === q.answer;
+    const isSkipped = ua === null || ua === '';
+    const isCorrect = !isSkipped && checkAnswer(ua, q);
     const cls = isSkipped ? 'was-skipped' : (isCorrect ? 'was-correct' : 'was-incorrect');
     const statusIcon = isSkipped ? '⏭️' : (isCorrect ? '✅' : '❌');
-    const yourAns = isSkipped
-      ? `<div class="review-answer skipped-a">⏭️ Your answer: <strong>Skipped</strong></div>`
-      : `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '✅' : '❌'} Your answer: <strong>${sanitizeInput(q.opts[ua])}</strong></div>`;
-    const correctAns = !isCorrect
-      ? `<div class="review-answer correct-ans">💡 Correct: <strong>${sanitizeInput(q.opts[q.answer])}</strong></div>` : '';
-
+    const questionText = safeHTML(q.q);
+    const explanationText = safeHTML(q.explanation);
+    
+    let yourAnsHtml;
+    if (isSkipped) {
+      yourAnsHtml = `<div class="review-answer skipped-a">⏭️ Your answer: <strong>Skipped</strong></div>`;
+    } else {
+      const ansText = safeHTML(ua);
+      yourAnsHtml = `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '✅' : '❌'} Your answer: <strong>${ansText || '(blank)'}</strong></div>`;
+    }
+    
+    let correctAnsHtml = '';
+    if (!isCorrect) {
+      const correctText = safeHTML(q.answer);
+      correctAnsHtml = `<div class="review-answer correct-ans">💡 Correct: <strong>${correctText}</strong></div>`;
+    }
+    
     return `<div class="review-item ${cls}" style="animation-delay:${i * 0.05}s">
-      <div class="review-q">${statusIcon} Q${i+1}: ${sanitizeInput(q.q)}</div>
-      <div class="review-answers">${yourAns}${correctAns}</div>
-      <div class="review-explanation"><strong>💡 Explanation:</strong> ${sanitizeInput(q.explanation)}</div>
+      <div class="review-q">${statusIcon} Q${i+1}: ${questionText}</div>
+      <div class="review-answers">${yourAnsHtml}${correctAnsHtml}</div>
+      <div class="review-explanation"><strong>💡 Explanation:</strong> ${explanationText}</div>
     </div>`;
   }).join('');
 }
@@ -672,6 +1105,7 @@ function renderResults(correct, incorrect, skipped, total, pct) {
 /* ===== CONFETTI ===== */
 function launchConfetti() {
   const wrap = document.getElementById('confetti-wrap');
+  if (!wrap) return;
   wrap.innerHTML = '';
   const colors = ['#8b5cf6','#a78bfa','#c4b5fd','#7c3aed','#6d28d9','#ede9fe','#ddd6fe'];
   for (let i = 0; i < 80; i++) {
@@ -700,15 +1134,39 @@ function adminLogin() {
   const errorDiv = document.getElementById('admin-login-error');
   const errorText = document.getElementById('admin-login-error-text');
   
+  const now = Date.now();
+  if (LOGIN_ATTEMPTS.lockoutUntil > now) {
+    const remaining = Math.ceil((LOGIN_ATTEMPTS.lockoutUntil - now) / 1000);
+    errorText.textContent = `Too many failed attempts. Please wait ${remaining} seconds.`;
+    errorDiv.classList.add('show');
+    return;
+  }
+  
+  if (LOGIN_ATTEMPTS.lockoutUntil > 0 && now > LOGIN_ATTEMPTS.lockoutUntil) {
+    LOGIN_ATTEMPTS.count = 0;
+    LOGIN_ATTEMPTS.lockoutUntil = 0;
+  }
+  
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    LOGIN_ATTEMPTS.count = 0;
     errorDiv.classList.remove('show');
     adminLoggedIn = true;
     document.getElementById('admin-username').value = '';
     document.getElementById('admin-password').value = '';
+    resetSessionTimeout();
     renderAdminDashboard();
     showScreen('screen-admin');
   } else {
-    errorText.textContent = 'Invalid username or password. Please try again.';
+    LOGIN_ATTEMPTS.count++;
+    
+    if (LOGIN_ATTEMPTS.count >= LOGIN_ATTEMPTS.maxAttempts) {
+      LOGIN_ATTEMPTS.lockoutUntil = now + LOGIN_ATTEMPTS.lockoutTime;
+      errorText.textContent = `Too many failed attempts. Please wait ${LOGIN_ATTEMPTS.lockoutTime/1000} seconds.`;
+    } else {
+      const remaining = LOGIN_ATTEMPTS.maxAttempts - LOGIN_ATTEMPTS.count;
+      errorText.textContent = `Invalid credentials. ${remaining} attempt(s) remaining.`;
+    }
+    
     errorDiv.classList.add('show');
     errorDiv.style.animation = 'none';
     requestAnimationFrame(() => { errorDiv.style.animation = 'shake 0.4s ease'; });
@@ -723,9 +1181,12 @@ function adminLogin() {
 
 function adminLogout() {
   adminLoggedIn = false;
+  clearSessionTimeout();
   document.getElementById('admin-username').value = '';
   document.getElementById('admin-password').value = '';
   document.getElementById('admin-login-error').classList.remove('show');
+  LOGIN_ATTEMPTS.count = 0;
+  LOGIN_ATTEMPTS.lockoutUntil = 0;
   showScreen('screen-landing');
 }
 
@@ -740,20 +1201,27 @@ function clearAllData() {
 
 async function confirmClearAll() {
   await clearAllResultsFromFirebase();
-  localStorage.removeItem('medtech_quiz_results');
+  try {
+    localStorage.removeItem('medtech_quiz_results');
+  } catch (e) {
+    console.warn('LocalStorage clear failed:', e);
+  }
   document.getElementById('delete-modal').classList.add('hidden');
   await renderAdminDashboard();
 }
 
 /* ===== DELETE SINGLE RECORD ===== */
 async function deleteRecord(id) {
+  if (!id) return;
   deleteTargetId = id;
   const results = await getResultsFromFirebase();
   const record = results.find(r => r.id === id);
   
   if (record) {
+    const safeUser = safeHTML(record.user);
+    const safeQuiz = safeHTML(record.quiz);
     document.getElementById('delete-message').textContent = 
-      `Are you sure you want to delete ${record.user}'s quiz result?\n\nQuiz: ${record.quiz}\nScore: ${record.score} (${record.pct}%)\nDate: ${record.date}\n\nThis action cannot be undone.`;
+      `Are you sure you want to delete ${safeUser}'s quiz result?\n\nQuiz: ${safeQuiz}\nScore: ${record.score} (${record.pct}%)\nDate: ${record.date}\n\nThis action cannot be undone.`;
     document.getElementById('delete-confirm-btn').onclick = confirmDeleteRecord;
     document.getElementById('delete-modal').classList.remove('hidden');
   }
@@ -767,9 +1235,13 @@ async function confirmDeleteRecord() {
     if (record && record.firestoreId) {
       await deleteResultFromFirebase(record.firestoreId);
     } else {
-      const localResults = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
-      const updated = localResults.filter(r => r.id !== deleteTargetId);
-      localStorage.setItem('medtech_quiz_results', JSON.stringify(updated));
+      try {
+        const localResults = JSON.parse(localStorage.getItem('medtech_quiz_results') || '[]');
+        const updated = localResults.filter(r => r.id !== deleteTargetId);
+        localStorage.setItem('medtech_quiz_results', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('LocalStorage update failed:', e);
+      }
     }
     
     deleteTargetId = null;
@@ -791,6 +1263,9 @@ async function renderAdminDashboard() {
   const seenSubmissionIds = new Set();
   
   for (const result of results) {
+    if (!result || typeof result !== 'object') continue;
+    if (!result.user || !result.quizId) continue;
+    
     if (result.submissionId && !seenSubmissionIds.has(result.submissionId)) {
       seenSubmissionIds.add(result.submissionId);
       uniqueResults.push(result);
@@ -798,20 +1273,21 @@ async function renderAdminDashboard() {
       uniqueResults.push(result);
     }
   }
-
-  const uniqueUsers = [...new Set(uniqueResults.map(r => r.user))];
+  
+  const uniqueUsers = [...new Set(uniqueResults.map(r => r.user).filter(Boolean))];
   const totalUsers = uniqueUsers.length;
   const totalAttempts = uniqueResults.length;
-  const avgPct = uniqueResults.length ? Math.round(uniqueResults.reduce((a, r) => a + r.pct, 0) / uniqueResults.length) : 0;
-  const topScore = uniqueResults.length ? Math.max(...uniqueResults.map(r => r.pct)) : 0;
-
+  const avgPct = uniqueResults.length ? Math.round(uniqueResults.reduce((a, r) => a + (r.pct || 0), 0) / uniqueResults.length) : 0;
+  const topScore = uniqueResults.length ? Math.max(...uniqueResults.map(r => r.pct || 0)) : 0;
+  
   document.getElementById('stat-users').textContent = totalUsers;
   document.getElementById('stat-attempts').textContent = totalAttempts;
   document.getElementById('stat-avg').textContent = `${avgPct}%`;
   document.getElementById('stat-top').textContent = `${topScore}%`;
-  document.getElementById('result-count').textContent = '';
-
+  document.getElementById('result-count').textContent = `${uniqueResults.length} Records`;
+  
   const tbody = document.getElementById('admin-tbody');
+  if (!tbody) return;
   
   if (!uniqueResults.length) {
     tbody.innerHTML = `
@@ -825,21 +1301,25 @@ async function renderAdminDashboard() {
       </tr>`;
     return;
   }
-
+  
   const sorted = [...uniqueResults].reverse();
   tbody.innerHTML = sorted.map((r, i) => {
     let badgeClass = 'score-badge-high';
     if (r.pct < 40) badgeClass = 'score-badge-low';
     else if (r.pct < 70) badgeClass = 'score-badge-mid';
     
-    const fullName = r.user;
+    const fullName = safeHTML(r.user || 'Unknown');
+    const section = safeHTML(r.section || 'N/A');
+    const group = safeHTML(r.group || 'N/A');
+    const quiz = safeHTML(r.quiz || 'Unknown Quiz');
+    const date = safeHTML(r.date || 'N/A');
     
     return `<tr>
       <td style="color:var(--text-muted)">${i + 1}</td>
-      <td><strong>${escHtml(fullName)}</strong></td>
-      <td style="color:var(--text-muted)">${escHtml(r.section || 'N/A')}</td>
-      <td style="color:var(--text-muted)">${escHtml(r.group || 'N/A')}</td>
-      <td style="color:var(--text-muted);font-size:0.85rem">${r.quiz}</td>
+      <td><strong>${fullName}</strong></td>
+      <td style="color:var(--text-muted)">${section}</td>
+      <td style="color:var(--text-muted)">${group}</td>
+      <td style="color:var(--text-muted);font-size:0.85rem">${quiz}</td>
       <td><span class="score-badge ${badgeClass}">${r.pct}% (${r.score})</span></td>
       <td>
         <div class="action-btns">
@@ -847,7 +1327,7 @@ async function renderAdminDashboard() {
           <button class="btn btn-icon btn-delete" onclick="deleteRecord(${r.id})" title="Delete Record">🗑️</button>
         </div>
       </td>
-      <td style="color:var(--text-muted);font-size:0.82rem">${r.date}</td>
+      <td style="color:var(--text-muted);font-size:0.82rem">${date}</td>
       <td>
         <div class="action-btns">
           <button class="btn btn-sm btn-secondary" onclick="showDetail(${r.id})" style="padding:6px 14px;font-size:0.8rem">View</button>
@@ -856,51 +1336,67 @@ async function renderAdminDashboard() {
     </tr>`;
   }).join('');
   
-  document.getElementById('result-count').textContent = '';
+  document.getElementById('result-count').textContent = `${uniqueResults.length} Records`;
 }
 
 /* ===== ADMIN DETAIL MODAL ===== */
 async function showDetail(id) {
+  if (!id) return;
+  
   const results = await getResultsFromFirebase();
   const r = results.find(x => x.id === id);
   if (!r) return;
-
+  
   const quiz = QUIZZES.find(q => q.id === r.quizId);
-  document.getElementById('modal-title').textContent = `${r.user}'s Quiz Results`;
-  document.getElementById('modal-sub').textContent = `${r.quiz} • ${r.date} • Score: ${r.score} (${r.pct}%)`;
-
+  const safeUser = safeHTML(r.user);
+  const safeQuiz = safeHTML(r.quiz);
+  const safeDate = safeHTML(r.date);
+  
+  document.getElementById('modal-title').textContent = `${safeUser}'s Quiz Results`;
+  document.getElementById('modal-sub').textContent = `${safeQuiz} • ${safeDate} • Score: ${r.score} (${r.pct}%)`;
+  
   if (quiz) {
-    document.getElementById('modal-body').innerHTML = quiz.questions.map((q, i) => {
-      const ua = r.answers[i];
-      const isSkipped = ua === null;
-      const isCorrect = !isSkipped && ua === q.answer;
+    const modalBody = document.getElementById('modal-body');
+    let html = '';
+    
+    quiz.questions.forEach((q, i) => {
+      const ua = r.answers && r.answers[i] !== undefined ? r.answers[i] : null;
+      const isSkipped = ua === null || ua === '' || ua === undefined;
+      const isCorrect = !isSkipped && checkAnswer(ua, q);
       
       let itemClass = 'skipped-item';
       if (isCorrect) itemClass = 'correct-item';
       else if (!isSkipped) itemClass = 'incorrect-item';
       
       const icon = isSkipped ? '⏭️' : (isCorrect ? '✅' : '❌');
+      const questionText = safeHTML(q.q);
       
       let answersHtml = '';
       if (isSkipped) {
+        const correctText = safeHTML(q.answer);
         answersHtml = `<div class="modal-answer answer-skipped">⏭️ Your answer: <strong>Skipped</strong></div>
-                       <div class="modal-answer answer-key">💡 Correct: <strong>${escHtml(q.opts[q.answer])}</strong></div>`;
+                       <div class="modal-answer answer-key">💡 Correct: <strong>${correctText}</strong></div>`;
       } else if (isCorrect) {
-        answersHtml = `<div class="modal-answer answer-correct">✅ Your answer: <strong>${escHtml(q.opts[ua])}</strong></div>`;
+        const ansText = safeHTML(ua);
+        answersHtml = `<div class="modal-answer answer-correct">✅ Your answer: <strong>${ansText}</strong></div>`;
       } else {
-        answersHtml = `<div class="modal-answer answer-incorrect">❌ Your answer: <strong>${escHtml(q.opts[ua])}</strong></div>
-                       <div class="modal-answer answer-key">💡 Correct: <strong>${escHtml(q.opts[q.answer])}</strong></div>`;
+        const ansText = safeHTML(ua || '(blank)');
+        const correctText = safeHTML(q.answer);
+        answersHtml = `<div class="modal-answer answer-incorrect">❌ Your answer: <strong>${ansText}</strong></div>
+                       <div class="modal-answer answer-key">💡 Correct: <strong>${correctText}</strong></div>`;
       }
       
-      return `<div class="modal-review-item ${itemClass}">
-        <div class="modal-q">${icon} Q${i + 1}: ${escHtml(q.q)}</div>
+      html += `<div class="modal-review-item ${itemClass}">
+        <div class="modal-q">${icon} Q${i + 1}: ${questionText}</div>
         <div class="modal-answers">${answersHtml}</div>
       </div>`;
-    }).join('');
+    });
+    
+    modalBody.innerHTML = html;
   } else {
     document.getElementById('modal-body').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">Quiz data not available</p>';
   }
-
+  
   document.getElementById('detail-modal').classList.remove('hidden');
 }
 
@@ -916,19 +1412,19 @@ document.getElementById('delete-modal').addEventListener('click', function(e) {
   if (e.target === this) closeDeleteModal();
 });
 
-/* ===== HELPER FUNCTIONS ===== */
 function escHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return safeHTML(str);
 }
 
 /* ===== KEYBOARD SHORTCUTS ===== */
 document.addEventListener('keydown', (e) => {
   if (document.getElementById('screen-quiz').classList.contains('active') && !answered) {
-    if (e.key === '1') selectAnswer(0);
-    else if (e.key === '2') selectAnswer(1);
-    else if (e.key === '3') selectAnswer(2);
-    else if (e.key === '4') selectAnswer(3);
+    if (e.key === 'Enter') {
+      const input = document.getElementById('answer-input');
+      if (document.activeElement === input) {
+        submitIdentificationAnswer();
+      }
+    }
   }
   
   if (e.key === 'Enter' && document.getElementById('screen-registration').classList.contains('active')) {
@@ -949,6 +1445,8 @@ document.addEventListener('keydown', (e) => {
 /* ===== ADMIN DASHBOARD REFRESH ===== */
 async function refreshDashboard() {
   const refreshBtn = document.getElementById('refresh-btn');
+  if (!refreshBtn) return;
+  
   refreshBtn.disabled = true;
   refreshBtn.innerHTML = '<span class="spin-icon">🔄</span> Refreshing...';
   
