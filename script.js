@@ -1110,7 +1110,7 @@ function renderResults(correct, incorrect, skipped, total, pct) {
     const isSkipped = ua === null || ua === '';
     const isCorrect = !isSkipped && checkAnswer(ua, q);
     const cls = isSkipped ? 'was-skipped' : (isCorrect ? 'was-correct' : 'was-incorrect');
-    const statusIcon = isSkipped ? '⏭️' : (isCorrect ? '' : '');
+    const statusIcon = isSkipped ? '' : (isCorrect ? '' : '');
     const questionText = safeHTML(q.q);
     const explanationText = safeHTML(q.explanation);
     
