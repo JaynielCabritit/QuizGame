@@ -29,88 +29,88 @@ const LOGIN_ATTEMPTS = {
 };
 
 /* ===== QUIZ DATA - Case 1 Identification ===== */
-// Based on "CASE 1 AY 2026-2027 PRELIMS.pdf"
+// Updated with new CASE #1 content
 const QUIZZES = Object.freeze([
   {
     id: 'case1',
-    title: '📋 CASE 1: Principles in Medical Laboratory Science',
-    desc: 'A case scenario involving Charles, a phlebotomist, and Mr. Robert Charles, a 58-year-old male patient with suspected sepsis. Answer 10 identification questions covering vascular system, venipuncture techniques, specimen collection, and quality assurance.',
+    title: 'CASE 1: Principles in Medical Laboratory Science',
+    desc: 'A case scenario involving Charles, a phlebotomist, and Mr. Robert Charles, a 58-year-old male patient with suspected sepsis. Answer 10 identification questions covering venipuncture techniques, specimen collection, and quality assurance.',
     icon: '📋',
     color: '--accent-purple',
     cardAccent: 'rgba(139, 92, 246, 0.08)',
     difficulty: 'medium',
-    timePerQ: 90, // 90 seconds total for all 10 questions
-    // 10 Identification questions based on the PDF
+    timePerQ: 90, // 90 seconds per question
+    // 10 Identification questions based on the new CASE #1
     questions: Object.freeze([
       {
-        q: "What is the primary function of capillaries in the vascular system?",
+        q: "What specific vein should Charles AVOID using if possible, because it is prone to rolling and located near an artery and nerve?",
         type: "identification",
-        answer: "exchange of nutrients and waste",
-        acceptableAnswers: ["exchange of nutrients and waste", "exchange of nutrients", "capillary exchange", "exchange of gases and nutrients", "nutrient and waste exchange"],
-        explanation: "Capillaries are microscopic vessels that connect arterioles and venules, enabling the exchange of oxygen, nutrients, and waste products between blood and tissues."
+        answer: "BASILIC VEIN",
+        acceptableAnswers: ["BASILIC VEIN", "BASILIC"],
+        explanation: "The basilic vein is prone to rolling and is located near the brachial artery and median nerve, making it a higher-risk venipuncture site."
       },
       {
-        q: "What condition in Mr. Robert Charles's history most significantly contributed to difficult venipuncture?",
+        q: "What condition does Mr. Robert Charles have that makes his veins less full and harder to puncture, due to vomiting and not drinking enough?",
         type: "identification",
-        answer: "dehydration",
-        acceptableAnswers: ["dehydration", "repeated vomiting and dehydration", "severe dehydration", "fluid volume deficit"],
-        explanation: "Dehydration from repeated vomiting and inability to eat/drink causes veins to collapse and become less visible, significantly reducing blood volume and venous pressure."
+        answer: "DEHYDRATION",
+        acceptableAnswers: ["DEHYDRATION"],
+        explanation: "Dehydration from repeated vomiting and insufficient fluid intake causes veins to collapse and become less visible, significantly reducing blood volume and venous pressure."
       },
       {
-        q: "What alternative technique should Charles use for a patient with difficult veins?",
+        q: "What type of blood collection device should Charles have used instead of a regular needle, given the patient's fragile veins?",
         type: "identification",
-        answer: "warm compresses",
-        acceptableAnswers: ["warm compresses", "apply warm compresses", "warming the site", "warm compress", "heat application"],
-        explanation: "Warm compresses applied for 5-10 minutes promote vasodilation, making veins more prominent and easier to access."
+        answer: "BUTTERFLY NEEDLE",
+        acceptableAnswers: ["BUTTERFLY NEEDLE", "BUTTERFLY"],
+        explanation: "A butterfly needle (winged infusion set) is preferred for fragile veins as it allows for better control and less trauma during venipuncture."
       },
       {
-        q: "What should Charles prioritize when encountering a failed blood draw in a severely dehydrated patient?",
+        q: "What specific pre-analytical problem occurs when a light blue-top tube is not filled completely, causing incorrect clotting test results?",
         type: "identification",
-        answer: "prioritize critical tests",
-        acceptableAnswers: ["prioritize critical tests", "prioritize sepsis tests", "blood cultures and lactate", "critical tests", "prioritize essential tests"],
-        explanation: "When limited blood can be obtained, Charles should prioritize the most critical tests needed for sepsis evaluation (blood cultures and lactate)."
+        answer: "UNDERFILLED",
+        acceptableAnswers: ["UNDERFILLED", "UNDERFILLED TUBE"],
+        explanation: "Underfilling a light blue-top tube disrupts the 9:1 blood-to-anticoagulant ratio, leading to inaccurate PT/PTT test results."
       },
       {
-        q: "How many venipuncture attempts should be made before seeking assistance from another phlebotomist?",
+        q: "What symptom did the patient show that indicates possible sepsis and systemic infection?",
         type: "identification",
-        answer: "2-3 attempts",
-        acceptableAnswers: ["2-3", "2 to 3", "2-3 attempts", "two to three", "2 or 3", "maximum of 3"],
-        explanation: "The protocol recommends a maximum of 2-3 venipuncture attempts per phlebotomist. Excessive attempts cause unnecessary patient trauma."
+        answer: "FEVER",
+        acceptableAnswers: ["FEVER"],
+        explanation: "Fever is a key systemic sign of sepsis, indicating the body's inflammatory response to a severe infection."
       },
       {
-        q: "Which tube type is correctly used for blood glucose collection?",
+        q: "What specific tube top color and additive are required for a Complete Blood Count (CBC) specimen?",
         type: "identification",
-        answer: "gray top tube",
-        acceptableAnswers: ["gray top", "gray top tube", "gray", "grey top", "sodium fluoride tube"],
-        explanation: "Gray top tubes contain sodium fluoride and potassium oxalate, which preserve glucose by inhibiting glycolysis."
+        answer: "LAVENDER TOP / EDTA",
+        acceptableAnswers: ["LAVENDER TOP / EDTA", "LAVENDER / EDTA", "PURPLE TOP / EDTA"],
+        explanation: "Lavender-top tubes contain EDTA (ethylenediaminetetraacetic acid) as an anticoagulant, which preserves cellular morphology for hematology testing."
       },
       {
-        q: "What pre-analytical factor most significantly affects PT/Protime test accuracy?",
+        q: "What is the primary antiseptic solution used for skin preparation prior to drawing blood culture specimens to prevent contamination?",
         type: "identification",
-        answer: "blood-to-anticoagulant ratio",
-        acceptableAnswers: ["blood-to-anticoagulant ratio", "9:1 ratio", "proper ratio", "correct blood to citrate ratio", "anticoagulant ratio"],
-        explanation: "PT testing requires a precise 9:1 blood-to-sodium citrate ratio. Underfilling or overfilling the tube alters this ratio, leading to inaccurate results."
+        answer: "CHLORHEXIDINE GLUCONATE",
+        acceptableAnswers: ["CHLORHEXIDINE GLUCONATE", "CHLORHEXIDINE"],
+        explanation: "Chlorhexidine gluconate is the preferred antiseptic for blood culture collection due to its broad-spectrum antimicrobial activity and persistent effect."
       },
       {
-        q: "How do CPD programs improve venipuncture success rates in a laboratory?",
+        q: "What specific tube top color and additive are required for a Prothrombin Time test?",
         type: "identification",
-        answer: "ongoing education and training",
-        acceptableAnswers: ["ongoing education", "continuing education", "professional development", "ongoing training", "CPD", "continuous skill development"],
-        explanation: "Continuing Professional Development programs provide ongoing education through workshops, simulation training, and case reviews to maintain current clinical skills."
+        answer: "LIGHT BLUE TOP / SODIUM CITRATE",
+        acceptableAnswers: ["LIGHT BLUE TOP / SODIUM CITRATE", "LIGHT BLUE / SODIUM CITRATE", "BLUE TOP / SODIUM CITRATE"],
+        explanation: "Light blue-top tubes contain sodium citrate, which binds calcium to prevent clotting, ensuring accurate PT/INR results."
       },
       {
-        q: "What is the primary function of veins in the vascular system?",
+        q: "What specific bodily response did Charles hear when he first inserted the tube that indicated a problem with the draw?",
         type: "identification",
-        answer: "return blood to the heart",
-        acceptableAnswers: ["return blood to the heart", "return deoxygenated blood", "venous return", "transport blood back to heart", "blood return"],
-        explanation: "Veins are blood vessels that return deoxygenated blood from the body's tissues back to the heart."
+        answer: "HISSING",
+        acceptableAnswers: ["HISSING", "HISS"],
+        explanation: "A hissing sound during venipuncture indicates that the tube's vacuum seal has been compromised or that the needle is not properly positioned."
       },
       {
-        q: "What effect does the patient's inability to eat and drink have on blood glucose testing?",
+        q: "What is the standard protocol and maximum number of unsuccessful venipuncture attempts permitted by a single phlebotomist before transferring the task to another healthcare professional?",
         type: "identification",
-        answer: "glycolysis continues",
-        acceptableAnswers: ["glycolysis continues", "glucose decreases", "glucose levels drop", "continued glycolysis", "glucose breakdown"],
-        explanation: "When a patient cannot eat, glycolysis continues in the blood sample, which can falsely lower glucose levels unless proper preservatives are used."
+        answer: "2 ATTEMPTS",
+        acceptableAnswers: ["2 ATTEMPTS", "2", "TWO ATTEMPTS"],
+        explanation: "The standard protocol limits a single phlebotomist to a maximum of 2 venipuncture attempts before transferring the responsibility to another healthcare professional."
       }
     ])
   }
@@ -141,7 +141,7 @@ let userProfile = {
   group: ''
 };
 let quizStartTime = null; // Track when quiz started for persistence
-let totalQuizTime = 90; // 90 seconds total
+let totalQuizTime = 90; // 90 seconds per question
 
 let sessionTimeout = null;
 const SESSION_DURATION = 3600000;
@@ -262,7 +262,7 @@ function restoreQuizState() {
       }
     }
     
-    document.getElementById('greeting-name').textContent = `👋 Welcome, ${safeHTML(currentUser)}!`;
+    document.getElementById('greeting-name').textContent = `Welcome, ${safeHTML(currentUser)}!`;
     showScreen('screen-quiz');
     renderQuestionFromState();
     return true;
@@ -315,17 +315,17 @@ function renderQuestionFromState() {
     
     let msg;
     if (isSkipped) {
-      msg = `⏰ Time's up! The correct answer was: ${safeHTML(qData.answer)}`;
+      msg = `Time's up! The correct answer was: ${safeHTML(qData.answer)}`;
       fb.className = 'feedback-banner show incorrect-fb';
-      icon.textContent = '⏰';
+      icon.textContent = '';
     } else if (isCorrect) {
-      msg = `🎉 Correct! Well done!`;
+      msg = `Correct! Well done!`;
       fb.className = 'feedback-banner show correct-fb';
-      icon.textContent = '✅';
+      icon.textContent = '';
     } else {
-      msg = `❌ Not quite! The correct answer was: ${safeHTML(qData.answer)}`;
+      msg = ` Not quite! The correct answer was: ${safeHTML(qData.answer)}`;
       fb.className = 'feedback-banner show incorrect-fb';
-      icon.textContent = '💡';
+      icon.textContent = '';
     }
     text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${safeHTML(qData.explanation)}</span>`;
     
@@ -334,7 +334,7 @@ function renderQuestionFromState() {
     if (!autoAdvanceTimeout && currentQIndex < currentQuiz.questions.length - 1) {
       autoAdvanceTimeout = setTimeout(() => {
         advanceQuestion();
-      }, 2000);
+      }, 3000);
     }
   }
   
@@ -360,12 +360,12 @@ function renderQuestionFromState() {
 
 function checkAnswer(input, qData) {
   if (!input || input.trim() === '') return false;
-  const normalizedInput = input.trim().toLowerCase().replace(/\s+/g, ' ');
+  const normalizedInput = input.trim().toUpperCase();
   
   // Check against acceptable answers
   if (qData.acceptableAnswers) {
     for (const ans of qData.acceptableAnswers) {
-      const normalizedAns = ans.toLowerCase().replace(/\s+/g, ' ');
+      const normalizedAns = ans.toUpperCase();
       if (normalizedInput === normalizedAns) return true;
       // Check if input contains the key answer
       if (normalizedInput.includes(normalizedAns) || normalizedAns.includes(normalizedInput)) {
@@ -376,7 +376,7 @@ function checkAnswer(input, qData) {
   }
   
   // Direct match with main answer
-  const mainAnswer = qData.answer.toLowerCase().replace(/\s+/g, ' ');
+  const mainAnswer = qData.answer.toUpperCase();
   if (normalizedInput === mainAnswer) return true;
   
   return false;
@@ -520,7 +520,8 @@ async function clearAllResultsFromFirebase() {
 /* ===== SCREEN MANAGEMENT ===== */
 function showScreen(id) {
   const validScreens = ['screen-landing', 'screen-registration', 'screen-select', 
-                        'screen-quiz', 'screen-results', 'screen-admin-login', 'screen-admin'];
+                        'screen-instructions', 'screen-quiz', 'screen-results', 
+                        'screen-admin-login', 'screen-admin'];
   if (!validScreens.includes(id)) {
     console.warn('Invalid screen ID:', id);
     return;
@@ -680,7 +681,7 @@ function startGame() {
     : `${userProfile.firstName} ${userProfile.lastName}`;
   
   currentUser = displayName;
-  document.getElementById('greeting-name').textContent = `👋 Welcome, ${safeHTML(displayName)}!`;
+  document.getElementById('greeting-name').textContent = `Welcome, ${safeHTML(displayName)}!`;
   
   renderQuizGrid();
   showScreen('screen-select');
@@ -709,29 +710,42 @@ function renderQuizGrid() {
   if (!grid) return;
   
   const diffClasses = { easy: 'badge-diff-easy', medium: 'badge-diff-medium', hard: 'badge-diff-hard' };
-  const diffLabels = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+  const diffLabels = { easy: 'Easy', medium: ' Medium', hard: ' Hard' };
   
   grid.innerHTML = QUIZZES.map((q, i) => {
     const title = safeHTML(q.title);
     const desc = safeHTML(q.desc);
-    const diffLabel = diffLabels[q.difficulty] || '🟡 Medium';
+    const diffLabel = diffLabels[q.difficulty] || ' Medium';
     const diffClass = diffClasses[q.difficulty] || 'badge-diff-medium';
     
-    return `<div class="quiz-card" style="--card-accent:var(${q.color}); --card-bg-accent:${q.cardAccent}" onclick="startQuiz(${i})">
+    return `<div class="quiz-card" style="--card-accent:var(${q.color}); --card-bg-accent:${q.cardAccent}" onclick="selectQuiz(${i})">
       <span class="quiz-card-icon">${q.icon}</span>
       <div class="quiz-card-title">${title}</div>
       <div class="quiz-card-desc">${desc}</div>
       <div class="quiz-card-meta">
-        <span class="quiz-badge badge-questions">📋 ${q.questions.length} Questions</span>
-        <span class="quiz-badge badge-time">⏱️ ${Math.floor(q.timePerQ/60)}:${String(q.timePerQ%60).padStart(2,'0')}</span>
+        <span class="quiz-badge badge-questions">${q.questions.length} Questions</span>
+        <span class="quiz-badge badge-time"> ${q.timePerQ}s each</span>
         <span class="quiz-badge ${diffClass}">${diffLabel}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-/* ===== START QUIZ ===== */
-function startQuiz(idx) {
+/* ===== SELECT QUIZ - Show Instructions ===== */
+function selectQuiz(idx) {
+  if (!QUIZZES[idx]) {
+    console.warn('Invalid quiz index');
+    return;
+  }
+  
+  // Store the selected quiz index for later
+  window._selectedQuizIdx = idx;
+  showScreen('screen-instructions');
+}
+
+/* ===== START QUIZ FROM INSTRUCTIONS ===== */
+function startQuizFromInstructions() {
+  const idx = window._selectedQuizIdx;
   if (!QUIZZES[idx]) {
     console.warn('Invalid quiz index');
     return;
@@ -764,13 +778,19 @@ function startQuiz(idx) {
   answered = false;
   isFinishing = false;
   timeLeft = totalQuizTime;
-  quizStartTime = Date.now();
+  quizStartTime = null;
   timerStartTimestamp = null;
   
   document.getElementById('quiz-title-bar').textContent = safeHTML(currentQuiz.title);
   showScreen('screen-quiz');
   renderQuestion();
   saveQuizState();
+}
+
+/* ===== START QUIZ (legacy) ===== */
+function startQuiz(idx) {
+  // Redirect to instructions screen
+  selectQuiz(idx);
 }
 
 /* ===== RENDER QUESTION ===== */
@@ -802,14 +822,25 @@ function renderQuestion() {
   const fb = document.getElementById('feedback-banner');
   fb.className = 'feedback-banner';
   
-  // Calculate remaining time
+  // Reset timer for this question
   if (quizStartTime) {
+    // Check if we need to reset the timer for each question
     const elapsed = (Date.now() - quizStartTime) / 1000;
-    timeLeft = Math.max(0, Math.floor(totalQuizTime - elapsed));
-    if (timeLeft <= 0) {
-      timeExpired();
-      return;
+    // If elapsed exceeds totalQuizTime, reset the timer
+    if (elapsed > totalQuizTime) {
+      quizStartTime = Date.now();
+      timeLeft = totalQuizTime;
+    } else {
+      timeLeft = Math.max(0, Math.floor(totalQuizTime - elapsed));
     }
+  } else {
+    quizStartTime = Date.now();
+    timeLeft = totalQuizTime;
+  }
+  
+  if (timeLeft <= 0) {
+    timeExpired();
+    return;
   }
   
   startTimer(timeLeft);
@@ -820,10 +851,12 @@ function renderQuestion() {
 function startTimer(seconds) {
   clearTimer();
   
+  // Ensure quizStartTime is set
   if (!quizStartTime) {
     quizStartTime = Date.now();
   }
   
+  // Calculate remaining time based on elapsed
   const elapsed = (Date.now() - quizStartTime) / 1000;
   timeLeft = Math.max(0, Math.floor(totalQuizTime - elapsed));
   
@@ -913,24 +946,22 @@ function submitIdentificationAnswer() {
   const input = document.getElementById('answer-input');
   const answer = input.value.trim();
   
-  if (answer === '') {
-    // Allow empty submission (will be marked as skipped)
-    // But we'll treat empty as skipped
-  }
+  // Convert to uppercase for validation
+  const normalizedAnswer = answer.toUpperCase();
   
   answered = true;
   clearTimer();
   
   const q = currentQuiz.questions[currentQIndex];
-  userAnswers[currentQIndex] = answer;
+  userAnswers[currentQIndex] = normalizedAnswer;
   
-  const isCorrect = checkAnswer(answer, q);
+  const isCorrect = checkAnswer(normalizedAnswer, q);
   
   disableInput();
   
   const msg = isCorrect
-    ? `🎉 Correct! Well done!`
-    : `❌ Not quite! The correct answer was: ${safeHTML(q.answer)}`;
+    ? ` Correct! Well done!`
+    : ` Not quite! The correct answer was: ${safeHTML(q.answer)}`;
   showFeedback(isCorrect, msg, q.explanation, false);
   
   document.getElementById('auto-advance-indicator').classList.add('show');
@@ -955,7 +986,7 @@ function showFeedback(correct, msg, explanation, skipped) {
   const text = document.getElementById('feedback-text');
   
   fb.className = `feedback-banner show ${correct ? 'correct-fb' : 'incorrect-fb'}`;
-  icon.textContent = correct ? '✅' : (skipped ? '⏰' : '💡');
+  icon.textContent = correct ? '' : (skipped ? '' : '');
   const safeMsg = safeHTML(msg);
   const safeExplanation = safeHTML(explanation);
   text.innerHTML = `${safeMsg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${safeExplanation}</span>`;
@@ -972,6 +1003,9 @@ function advanceQuestion() {
   if (currentQIndex >= currentQuiz.questions.length) {
     finishQuiz();
   } else {
+    // Reset timer for next question
+    quizStartTime = Date.now();
+    timeLeft = totalQuizTime;
     renderQuestion();
     saveQuizState();
   }
@@ -1046,11 +1080,11 @@ async function finishQuiz() {
 /* ===== RENDER RESULTS ===== */
 function renderResults(correct, incorrect, skipped, total, pct) {
   let emoji, title, subtitle;
-  if (pct === 100) { emoji='🏆'; title='Perfect Score!'; subtitle='You mastered the case study!'; }
-  else if (pct >= 80) { emoji='🎉'; title='Excellent Work!'; subtitle='Strong understanding of the material!'; }
-  else if (pct >= 60) { emoji='😊'; title='Good Job!'; subtitle='Solid performance — keep studying!'; }
-  else if (pct >= 40) { emoji='📚'; title='Keep Studying!'; subtitle='Review the case and try again!'; }
-  else { emoji='💪'; title="Don't Give Up!"; subtitle='Practice makes perfect — retry the quiz!'; }
+  if (pct === 100) { emoji=''; title='Perfect Score!'; subtitle='You mastered the case study!'; }
+  else if (pct >= 80) { emoji=''; title='Excellent Work!'; subtitle='Strong understanding of the material!'; }
+  else if (pct >= 60) { emoji=''; title='Good Job!'; subtitle='Solid performance — keep studying!'; }
+  else if (pct >= 40) { emoji=''; title='Keep Studying!'; subtitle='Review the case and try again!'; }
+  else { emoji=''; title="Don't Give Up!"; subtitle='Practice makes perfect — retry the quiz!'; }
   
   document.getElementById('results-emoji').textContent = emoji;
   document.getElementById('results-title').textContent = title;
@@ -1076,7 +1110,7 @@ function renderResults(correct, incorrect, skipped, total, pct) {
     const isSkipped = ua === null || ua === '';
     const isCorrect = !isSkipped && checkAnswer(ua, q);
     const cls = isSkipped ? 'was-skipped' : (isCorrect ? 'was-correct' : 'was-incorrect');
-    const statusIcon = isSkipped ? '⏭️' : (isCorrect ? '✅' : '❌');
+    const statusIcon = isSkipped ? '⏭️' : (isCorrect ? '' : '');
     const questionText = safeHTML(q.q);
     const explanationText = safeHTML(q.explanation);
     
@@ -1085,19 +1119,19 @@ function renderResults(correct, incorrect, skipped, total, pct) {
       yourAnsHtml = `<div class="review-answer skipped-a">⏭️ Your answer: <strong>Skipped</strong></div>`;
     } else {
       const ansText = safeHTML(ua);
-      yourAnsHtml = `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '✅' : '❌'} Your answer: <strong>${ansText || '(blank)'}</strong></div>`;
+      yourAnsHtml = `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '' : ''} Your answer: <strong>${ansText || '(blank)'}</strong></div>`;
     }
     
     let correctAnsHtml = '';
     if (!isCorrect) {
       const correctText = safeHTML(q.answer);
-      correctAnsHtml = `<div class="review-answer correct-ans">💡 Correct: <strong>${correctText}</strong></div>`;
+      correctAnsHtml = `<div class="review-answer correct-ans"> Correct: <strong>${correctText}</strong></div>`;
     }
     
     return `<div class="review-item ${cls}" style="animation-delay:${i * 0.05}s">
       <div class="review-q">${statusIcon} Q${i+1}: ${questionText}</div>
       <div class="review-answers">${yourAnsHtml}${correctAnsHtml}</div>
-      <div class="review-explanation"><strong>💡 Explanation:</strong> ${explanationText}</div>
+      <div class="review-explanation"><strong>Explanation:</strong> ${explanationText}</div>
     </div>`;
   }).join('');
 }
@@ -1368,22 +1402,22 @@ async function showDetail(id) {
       if (isCorrect) itemClass = 'correct-item';
       else if (!isSkipped) itemClass = 'incorrect-item';
       
-      const icon = isSkipped ? '⏭️' : (isCorrect ? '✅' : '❌');
+      const icon = isSkipped ? '⏭️' : (isCorrect ? '' : '');
       const questionText = safeHTML(q.q);
       
       let answersHtml = '';
       if (isSkipped) {
         const correctText = safeHTML(q.answer);
-        answersHtml = `<div class="modal-answer answer-skipped">⏭️ Your answer: <strong>Skipped</strong></div>
-                       <div class="modal-answer answer-key">💡 Correct: <strong>${correctText}</strong></div>`;
+        answersHtml = `<div class="modal-answer answer-skipped">⏭Your answer: <strong>Skipped</strong></div>
+                       <div class="modal-answer answer-key">Correct: <strong>${correctText}</strong></div>`;
       } else if (isCorrect) {
         const ansText = safeHTML(ua);
-        answersHtml = `<div class="modal-answer answer-correct">✅ Your answer: <strong>${ansText}</strong></div>`;
+        answersHtml = `<div class="modal-answer answer-correct">Your answer: <strong>${ansText}</strong></div>`;
       } else {
         const ansText = safeHTML(ua || '(blank)');
         const correctText = safeHTML(q.answer);
-        answersHtml = `<div class="modal-answer answer-incorrect">❌ Your answer: <strong>${ansText}</strong></div>
-                       <div class="modal-answer answer-key">💡 Correct: <strong>${correctText}</strong></div>`;
+        answersHtml = `<div class="modal-answer answer-incorrect">Your answer: <strong>${ansText}</strong></div>
+                       <div class="modal-answer answer-key">Correct: <strong>${correctText}</strong></div>`;
       }
       
       html += `<div class="modal-review-item ${itemClass}">
@@ -1453,20 +1487,20 @@ async function refreshDashboard() {
   try {
     await new Promise(resolve => setTimeout(resolve, 500));
     await renderAdminDashboard();
-    refreshBtn.innerHTML = '<span>✅</span> Updated!';
+    refreshBtn.innerHTML = '<span></span> Updated!';
     
     setTimeout(() => {
       refreshBtn.disabled = false;
-      refreshBtn.innerHTML = '<span>🔄</span> Refresh';
+      refreshBtn.innerHTML = '<span></span> Refresh';
     }, 1500);
     
   } catch (error) {
     console.error('Error refreshing dashboard:', error);
-    refreshBtn.innerHTML = '<span>❌</span> Error';
+    refreshBtn.innerHTML = '<span></span> Error';
     
     setTimeout(() => {
       refreshBtn.disabled = false;
-      refreshBtn.innerHTML = '<span>🔄</span> Refresh';
+      refreshBtn.innerHTML = '<span></span> Refresh';
     }, 2000);
   }
 }
