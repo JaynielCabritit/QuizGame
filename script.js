@@ -20,76 +20,105 @@ const ADMIN_CREDENTIALS = {
 };
 
 /* ===== QUIZ DATABASE ===== */
+/* ===== QUIZ DATABASE ===== */
 const QUIZZES = [
   {
-    id: 'tls',
-    title: '📚 Teaching & Learning Strategies',
-    desc: 'Test your knowledge on effective formal discussions, infographics, and role-playing strategies in medical education.',
-    icon: '📚',
+    id: 'case1',
+    title: '📋 CASE 1: Principles in Medical Laboratory Science',
+    desc: 'A case scenario involving Charles, a phlebotomist, and Mr. Robert Charles, a 58-year-old male patient with suspected sepsis. Answer 8 guide questions covering vascular system, venipuncture techniques, specimen collection, and quality assurance.',
+    icon: '📋',
     color: '--accent-purple',
     cardAccent: 'rgba(139, 92, 246, 0.08)',
     difficulty: 'medium',
-    timePerQ: 30,
+    timePerQ: 45,
     questions: [
       {
-        q: "What is a recommended practice for conducting an effective formal discussion?",
-        opts: ["Ask students to create an infographic summarizing the discussion.", "Require students to memorize the panelists' opening statements.", "Instruct students to take down notes during the discussion.", "Have students debate the panelists after the discussion."],
-        answer: 2,
-        explanation: "Taking down notes during a formal discussion helps students stay engaged and capture important points for later review. This is listed as a primary reminder for effective formal discussions in Section 3.1."
-      },
-      {
-        q: "Which of the following is NOT a free online tool for creating infographics?",
-        opts: ["Vizualize", "Piktochart", "Canva", "Photoshop"],
-        answer: 3,
-        explanation: "Photoshop is a professional image-editing software requiring a paid subscription. Vizualize, Piktochart, and Canva are all free tools explicitly mentioned for creating infographics."
-      },
-      {
-        q: "What is the primary educational value of using infographics in teaching and learning?",
-        opts: ["They replace the need for traditional lectures entirely.", "They help students understand complex ideas more easily.", "They are primarily used for testing design skills.", "They allow students to avoid reading academic sources."],
+        q: "What is the primary function of capillaries in the vascular system?",
+        opts: [
+          "Transport oxygenated blood away from the heart",
+          "Facilitate exchange of nutrients and waste at cellular level",
+          "Return deoxygenated blood back to the heart",
+          "Regulate blood pressure through vasoconstriction"
+        ],
         answer: 1,
-        explanation: "Infographics present information in a visual format that makes complex ideas easier to understand at a glance, which is their main educational benefit. They supplement, not replace, traditional methods."
+        explanation: "Capillaries are microscopic vessels that connect arterioles and venules, enabling the exchange of oxygen, nutrients, and waste products between blood and tissues. This exchange is essential for cellular metabolism and maintaining tissue health."
       },
       {
-        q: "When creating an infographic, what should you do immediately after outlining your goals?",
-        opts: ["Visualize the data.", "Layout the design elements using a grid.", "Publish the infographic online.", "Collect data from various sources."],
-        answer: 3,
-        explanation: "The proper sequence is: 1) Outline goals, 2) Collect data, 3) Visualize data, 4) Layout the design. Collecting data comes right after establishing clear communication goals."
-      },
-      {
-        q: "What is a good design practice for maintaining visual consistency in an infographic?",
-        opts: ["Use as many different font styles as possible.", "Fill all empty space with text or images.", "Keep icon colors, style, and size consistent.", "Avoid using any extra graphic elements."],
-        answer: 2,
-        explanation: "Keeping icon colors, style, and size consistent creates a cohesive and professional visual design. The other options contradict recommended design principles such as using readable fonts and intentional white space."
-      },
-      {
-        q: "How do infographics primarily benefit students in their learning process?",
-        opts: ["They allow students to write longer, more voluminous text in bullet points.", "They help students analyze and remember information more easily.", "They are used to teach students how to code websites.", "They focus exclusively on numbers and exclude all pictures and graphics."],
+        q: "Which factor in the patient's history most significantly contributed to difficult venipuncture?",
+        opts: [
+          "The patient's age of 58 years",
+          "Repeated vomiting and dehydration",
+          "Mild confusion and weakness",
+          "Three days of fever and chills"
+        ],
         answer: 1,
-        explanation: "Infographics help students analyze and retain information more effectively through visual presentation. They actually help students avoid voluminous bullet-point text, not create more of it."
+        explanation: "Dehydration from repeated vomiting and inability to eat/drink causes veins to collapse and become less visible, significantly reducing blood volume and venous pressure. This makes vein selection, palpation, and successful cannulation extremely challenging."
       },
       {
-        q: "What is one notable advantage of using role-playing as a teaching strategy?",
-        opts: ["It allows students to passively listen to recorded scenarios.", "It focuses solely on individual work and independent study.", "It transforms the learning content from information into an experience.", "It guarantees a perfect, error-free performance from students."],
-        answer: 2,
-        explanation: "Role-playing actively engages students and turns abstract content into a lived experience, making learning more meaningful. This is a key advantage listed for role-playing activities."
-      },
-      {
-        q: "What is a possible disadvantage of role-playing activities in the classroom?",
-        opts: ["It prevents teachers from assessing interpersonal skills.", "Some students may become too emotionally involved in the situation.", "It discourages higher-order thinking.", "Every student is always required to participate simultaneously."],
+        q: "What alternative technique should Charles use for a patient with difficult veins?",
+        opts: [
+          "Use a larger gauge needle (18G) for better flow",
+          "Apply warm compresses to dilate veins before collection",
+          "Perform venipuncture on the patient's foot without consulting physician",
+          "Keep the patient's arm elevated above heart level"
+        ],
         answer: 1,
-        explanation: "One listed disadvantage is that role-playing can cause some students to become overly emotionally involved. Role-playing actually helps teachers assess interpersonal skills and promotes higher-order thinking."
+        explanation: "Warm compresses applied for 5-10 minutes promote vasodilation, making veins more prominent and easier to access. This is especially helpful for patients with poor venous access due to dehydration or previous difficult draws."
       },
       {
-        q: "After introducing a role-playing scenario, what should a teacher do next?",
-        opts: ["Immediately select participants and assign roles.", "Give students time to prepare their roles independently.", "Discuss the situation with the class, focusing on the intended learning outcomes.", "Begin the enactment and observe the participants."],
-        answer: 2,
-        explanation: "The proper sequence is: introduce the scenario, then discuss it with students to clarify learning outcomes and relevant issues. Selecting participants and assigning roles comes after this discussion."
+        q: "What should Charles prioritize when encountering a failed blood draw in a severely dehydrated patient?",
+        opts: [
+          "Continue attempting at the same site until successful",
+          "Prioritize critical tests for sepsis evaluation",
+          "Abandon all testing and send the patient home",
+          "Perform all tests using only capillary blood"
+        ],
+        answer: 1,
+        explanation: "When limited blood can be obtained, Charles should prioritize the most critical tests needed for sepsis evaluation (blood cultures and lactate), while balancing patient safety and comfort. Clinical laboratory science knowledge helps determine test urgency and appropriate collection methods."
       },
       {
-        q: "What is an effective way to spark student interest before beginning a role-play activity?",
-        opts: ["Grade students on their acting ability to motivate them.", "Assign roles immediately without any introduction.", "Use stimulus materials like a short video or information from the internet.", "Ask shy students to sit out and only observe."],
+        q: "How many venipuncture attempts should be made before seeking assistance from another phlebotomist?",
+        opts: [
+          "Maximum of 2-3 attempts",
+          "Maximum of 5-7 attempts",
+          "Continue until successful regardless of attempts",
+          "Only 1 attempt is allowed"
+        ],
+        answer: 0,
+        explanation: "The protocol recommends a maximum of 2-3 venipuncture attempts per phlebotomist. Excessive attempts cause unnecessary patient trauma, discomfort, and can damage veins, making future collections more difficult. After 2-3 unsuccessful attempts, seeking assistance from an experienced colleague is appropriate."
+      },
+      {
+        q: "Which tube type is correctly matched with its corresponding test?",
+        opts: [
+          "Lavender top tube for PT/Protime testing",
+          "Light blue top tube for Complete Blood Count",
+          "Gray top tube for Blood Glucose collection",
+          "Red top tube for Blood Cultures"
+        ],
         answer: 2,
-        explanation: "Providing stimulus materials such as a short video or internet resources helps arouse curiosity and engages students with the topic. The focus should always be on learning, not on grading acting performance."
+        explanation: "Gray top tubes contain sodium fluoride and potassium oxalate, which preserve glucose by inhibiting glycolysis. This is essential for accurate blood glucose testing. CBC requires lavender top (EDTA), PT requires light blue top (citrate), and blood cultures require dedicated culture bottles."
+      },
+      {
+        q: "What pre-analytical factor most significantly affects PT/Protime test accuracy?",
+        opts: [
+          "Patient's emotional state during collection",
+          "Proper blood-to-anticoagulant ratio (9:1)",
+          "Time of day when blood is collected",
+          "Patient's body temperature during collection"
+        ],
+        answer: 1,
+        explanation: "PT testing requires a precise 9:1 blood-to-sodium citrate ratio. Underfilling or overfilling the tube alters this ratio, leading to inaccurate results. Other critical factors include proper mixing, timely processing (within 4-6 hours), and avoiding hemolysis."
+      },
+      {
+        q: "How do CPD programs improve venipuncture success rates in a laboratory?",
+        opts: [
+          "They only focus on administrative documentation tasks",
+          "They provide ongoing education on updated techniques and patient assessment",
+          "They eliminate the need for competency assessments",
+          "They replace all hands-on training with online modules"
+        ],
+        answer: 1,
+        explanation: "Continuing Professional Development programs provide ongoing education through workshops, simulation training, and case reviews. This ensures phlebotomists maintain current clinical skills, learn from adverse events, and improve first-stick success rates through continuous skill development."
       }
     ]
   }
