@@ -259,7 +259,7 @@ function restoreQuizState() {
       }
     }
     
-    document.getElementById('greeting-name').textContent = `Welcome, ${escapeText(currentUser)}!`;
+    document.getElementById('greeting-name').textContent = `Welcome, ${currentUser}!`;
     showScreen('screen-quiz');
     renderQuestionFromState();
     return true;
@@ -308,7 +308,7 @@ function renderQuestionFromState() {
     
     let msg;
     if (isSkipped) {
-      msg = `Time's up! The correct answer was: ${escapeText(qData.answer)}`;
+      msg = `Time's up! The correct answer was: ${qData.answer}`;
       fb.className = 'feedback-banner show incorrect-fb';
       icon.textContent = '';
     } else if (isCorrect) {
@@ -316,11 +316,11 @@ function renderQuestionFromState() {
       fb.className = 'feedback-banner show correct-fb';
       icon.textContent = '';
     } else {
-      msg = `Not quite! The correct answer was: ${escapeText(qData.answer)}`;
+      msg = `Not quite! The correct answer was: ${qData.answer}`;
       fb.className = 'feedback-banner show incorrect-fb';
       icon.textContent = '';
     }
-    text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${escapeText(qData.explanation)}</span>`;
+    text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${qData.explanation}</span>`;
     
     document.getElementById('auto-advance-indicator').classList.add('show');
     
@@ -380,21 +380,8 @@ function sanitizeInput(input) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
     .replace(/`/g, '&#96;')
     .trim();
-}
-
-function escapeText(content) {
-  if (typeof content !== 'string') return '';
-  return sanitizeInput(content);
-}
-
-function safeHTML(content) {
-  if (typeof content !== 'string') return '';
-  // For display purposes, we want to show the text as-is with proper formatting
-  // But we still need to sanitize for security
-  return sanitizeInput(content);
 }
 
 function generateSubmissionId(user, quizId) {
@@ -676,7 +663,7 @@ function startGame() {
     : `${userProfile.firstName} ${userProfile.lastName}`;
   
   currentUser = displayName;
-  document.getElementById('greeting-name').textContent = `Welcome, ${escapeText(displayName)}!`;
+  document.getElementById('greeting-name').textContent = `Welcome, ${displayName}!`;
   
   renderQuizGrid();
   showScreen('screen-select');
@@ -708,8 +695,8 @@ function renderQuizGrid() {
   const diffLabels = { easy: 'Easy', medium: ' Medium', hard: ' Hard' };
   
   grid.innerHTML = QUIZZES.map((q, i) => {
-    const title = escapeText(q.title);
-    const desc = escapeText(q.desc);
+    const title = q.title;
+    const desc = q.desc;
     const diffLabel = diffLabels[q.difficulty] || ' Medium';
     const diffClass = diffClasses[q.difficulty] || 'badge-diff-medium';
     
@@ -775,7 +762,7 @@ function startQuizFromInstructions() {
   quizStartTime = null;
   timerStartTimestamp = null;
   
-  document.getElementById('quiz-title-bar').textContent = escapeText(currentQuiz.title);
+  document.getElementById('quiz-title-bar').textContent = currentQuiz.title;
   showScreen('screen-quiz');
   renderQuestion();
   saveQuizState();
@@ -911,7 +898,7 @@ function timeExpired() {
   
   const q = currentQuiz.questions[currentQIndex];
   disableInput();
-  showFeedback(false, `⏰ Time's up! The correct answer was: ${escapeText(q.answer)}`, q.explanation, true);
+  showFeedback(false, `⏰ Time's up! The correct answer was: ${q.answer}`, q.explanation, true);
   
   document.getElementById('auto-advance-indicator').classList.add('show');
   timerStartTimestamp = null;
@@ -943,7 +930,7 @@ function submitIdentificationAnswer() {
   
   const msg = isCorrect
     ? `Correct! Well done!`
-    : `Not quite! The correct answer was: ${escapeText(q.answer)}`;
+    : `Not quite! The correct answer was: ${q.answer}`;
   showFeedback(isCorrect, msg, q.explanation, false);
   
   document.getElementById('auto-advance-indicator').classList.add('show');
@@ -969,9 +956,9 @@ function showFeedback(correct, msg, explanation, skipped) {
   
   fb.className = `feedback-banner show ${correct ? 'correct-fb' : 'incorrect-fb'}`;
   icon.textContent = correct ? '' : (skipped ? '' : '');
-  const safeMsg = escapeText(msg);
-  const safeExplanation = escapeText(explanation);
-  text.innerHTML = `${safeMsg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${safeExplanation}</span>`;
+  
+  // Direct display - no encoding for slash
+  text.innerHTML = `${msg}<br><span style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${explanation}</span>`;
 }
 
 /* ===== ADVANCE QUESTION ===== */
@@ -1092,20 +1079,20 @@ function renderResults(correct, incorrect, skipped, total, pct) {
     const isCorrect = !isSkipped && checkAnswer(ua, q);
     const cls = isSkipped ? 'was-skipped' : (isCorrect ? 'was-correct' : 'was-incorrect');
     const statusIcon = isSkipped ? '' : (isCorrect ? '' : '');
-    const questionText = escapeText(q.q);
-    const explanationText = escapeText(q.explanation);
+    const questionText = q.q;
+    const explanationText = q.explanation;
     
     let yourAnsHtml;
     if (isSkipped) {
       yourAnsHtml = `<div class="review-answer skipped-a"> Your answer: <strong>Skipped</strong></div>`;
     } else {
-      const ansText = escapeText(ua);
+      const ansText = ua;
       yourAnsHtml = `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '' : ''} Your answer: <strong>${ansText || '(blank)'}</strong></div>`;
     }
     
     let correctAnsHtml = '';
     if (!isCorrect) {
-      const correctText = escapeText(q.answer);
+      const correctText = q.answer;
       correctAnsHtml = `<div class="review-answer correct-ans"> Correct: <strong>${correctText}</strong></div>`;
     }
     
@@ -1233,8 +1220,8 @@ async function deleteRecord(id) {
   const record = results.find(r => r.id === id);
   
   if (record) {
-    const safeUser = escapeText(record.user);
-    const safeQuiz = escapeText(record.quiz);
+    const safeUser = record.user;
+    const safeQuiz = record.quiz;
     document.getElementById('delete-message').textContent = 
       `Are you sure you want to delete ${safeUser}'s quiz result?\n\nQuiz: ${safeQuiz}\nScore: ${record.score} (${record.pct}%)\nDate: ${record.date}\n\nThis action cannot be undone.`;
     document.getElementById('delete-confirm-btn').onclick = confirmDeleteRecord;
@@ -1323,11 +1310,11 @@ async function renderAdminDashboard() {
     if (r.pct < 40) badgeClass = 'score-badge-low';
     else if (r.pct < 70) badgeClass = 'score-badge-mid';
     
-    const fullName = escapeText(r.user || 'Unknown');
-    const section = escapeText(r.section || 'N/A');
-    const group = escapeText(r.group || 'N/A');
-    const quiz = escapeText(r.quiz || 'Unknown Quiz');
-    const date = escapeText(r.date || 'N/A');
+    const fullName = r.user || 'Unknown';
+    const section = r.section || 'N/A';
+    const group = r.group || 'N/A';
+    const quiz = r.quiz || 'Unknown Quiz';
+    const date = r.date || 'N/A';
     
     return `<tr>
       <td style="color:var(--text-muted)">${i + 1}</td>
@@ -1363,9 +1350,9 @@ async function showDetail(id) {
   if (!r) return;
   
   const quiz = QUIZZES.find(q => q.id === r.quizId);
-  const safeUser = escapeText(r.user);
-  const safeQuiz = escapeText(r.quiz);
-  const safeDate = escapeText(r.date);
+  const safeUser = r.user;
+  const safeQuiz = r.quiz;
+  const safeDate = r.date;
   
   document.getElementById('modal-title').textContent = `${safeUser}'s Quiz Results`;
   document.getElementById('modal-sub').textContent = `${safeQuiz} • ${safeDate} • Score: ${r.score} (${r.pct}%)`;
@@ -1384,19 +1371,19 @@ async function showDetail(id) {
       else if (!isSkipped) itemClass = 'incorrect-item';
       
       const icon = isSkipped ? '' : (isCorrect ? '' : '');
-      const questionText = escapeText(q.q);
+      const questionText = q.q;
       
       let answersHtml = '';
       if (isSkipped) {
-        const correctText = escapeText(q.answer);
+        const correctText = q.answer;
         answersHtml = `<div class="modal-answer answer-skipped">⏭Your answer: <strong>Skipped</strong></div>
                        <div class="modal-answer answer-key">Correct: <strong>${correctText}</strong></div>`;
       } else if (isCorrect) {
-        const ansText = escapeText(ua);
+        const ansText = ua;
         answersHtml = `<div class="modal-answer answer-correct">Your answer: <strong>${ansText}</strong></div>`;
       } else {
-        const ansText = escapeText(ua || '(blank)');
-        const correctText = escapeText(q.answer);
+        const ansText = ua || '(blank)';
+        const correctText = q.answer;
         answersHtml = `<div class="modal-answer answer-incorrect">Your answer: <strong>${ansText}</strong></div>
                        <div class="modal-answer answer-key">Correct: <strong>${correctText}</strong></div>`;
       }
@@ -1428,7 +1415,7 @@ document.getElementById('delete-modal').addEventListener('click', function(e) {
 });
 
 function escHtml(str) {
-  return escapeText(str);
+  return str;
 }
 
 /* ===== KEYBOARD SHORTCUTS ===== */
@@ -1463,7 +1450,7 @@ async function refreshDashboard() {
   if (!refreshBtn) return;
   
   refreshBtn.disabled = true;
-  refreshBtn.innerHTML = '<span class="spin-icon"></span> Refreshing...';
+  refreshBtn.innerHTML = '<span class="spin-icon">🔄</span> Refreshing...';
   
   try {
     await new Promise(resolve => setTimeout(resolve, 500));
