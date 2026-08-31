@@ -20,7 +20,6 @@ const ADMIN_CREDENTIALS = {
 };
 
 /* ===== QUIZ DATABASE ===== */
-/* ===== QUIZ DATABASE ===== */
 const QUIZZES = [
   {
     id: 'case1',
