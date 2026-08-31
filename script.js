@@ -1116,7 +1116,7 @@ function renderResults(correct, incorrect, skipped, total, pct) {
     
     let yourAnsHtml;
     if (isSkipped) {
-      yourAnsHtml = `<div class="review-answer skipped-a">⏭️ Your answer: <strong>Skipped</strong></div>`;
+      yourAnsHtml = `<div class="review-answer skipped-a"> Your answer: <strong>Skipped</strong></div>`;
     } else {
       const ansText = safeHTML(ua);
       yourAnsHtml = `<div class="review-answer your-answer ${isCorrect ? 'correct-a' : 'wrong-a'}">${isCorrect ? '' : ''} Your answer: <strong>${ansText || '(blank)'}</strong></div>`;
@@ -1402,7 +1402,7 @@ async function showDetail(id) {
       if (isCorrect) itemClass = 'correct-item';
       else if (!isSkipped) itemClass = 'incorrect-item';
       
-      const icon = isSkipped ? '⏭️' : (isCorrect ? '' : '');
+      const icon = isSkipped ? '' : (isCorrect ? '' : '');
       const questionText = safeHTML(q.q);
       
       let answersHtml = '';
